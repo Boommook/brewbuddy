@@ -1,0 +1,183 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@theme {
+  --color-cayenne-red-50: #feefe6;
+  --color-cayenne-red-100: #fedfcd;
+  --color-cayenne-red-200: #fdbf9b;
+  --color-cayenne-red-300: #fc9f69;
+  --color-cayenne-red-400: #fb7f37;
+  --color-cayenne-red-500: #fa5f05; /* base */
+  --color-cayenne-red-600: #c84c04;
+  --color-cayenne-red-700: #963903;
+  --color-cayenne-red-800: #642602;
+  --color-cayenne-red-900: #321301;
+  --color-cayenne-red-950: #230d01;
+
+  --color-harvest-orange-50: #fef1e6;
+  --color-harvest-orange-100: #fee4cd;
+  --color-harvest-orange-200: #fdc99b;
+  --color-harvest-orange-300: #fcae69;
+  --color-harvest-orange-400: #fb9237;
+  --color-harvest-orange-500: #fa7705; /* base */
+  --color-harvest-orange-600: #c85f04;
+  --color-harvest-orange-700: #964803;
+  --color-harvest-orange-800: #643002;
+  --color-harvest-orange-900: #321801;
+  --color-harvest-orange-950: #231101;
+
+  --color-golden-orange-50: #fef6e6;
+  --color-golden-orange-100: #feedcd;
+  --color-golden-orange-200: #fddb9b;
+  --color-golden-orange-300: #fcc969;
+  --color-golden-orange-400: #fbb637;
+  --color-golden-orange-500: #faa405; /* base */
+  --color-golden-orange-600: #c88304;
+  --color-golden-orange-700: #966303;
+  --color-golden-orange-800: #644202;
+  --color-golden-orange-900: #322101;
+  --color-golden-orange-950: #231701;
+
+  --color-camel-50: #f5f3ef;
+  --color-camel-100: #ebe7e0;
+  --color-camel-200: #d8d0c0;
+  --color-camel-300: #c4b8a1;
+  --color-camel-400: #b0a082;
+  --color-camel-500: #9d8862; /* base */
+  --color-camel-600: #7d6d4f;
+  --color-camel-700: #5e523b;
+  --color-camel-800: #3f3727;
+  --color-camel-900: #1f1b14;
+  --color-camel-950: #16130e;
+  
+  --color-antique-white-50: #f9f3eb;
+  --color-antique-white-100: #f3e7d8; /* base */
+  --color-antique-white-200: #e7cfb1;
+  --color-antique-white-300: #dbb78a;
+  --color-antique-white-400: #cf9e63;
+  --color-antique-white-500: #c3863c;
+  --color-antique-white-600: #9c6b30;
+  --color-antique-white-700: #755124;
+  --color-antique-white-800: #4e3618;
+  --color-antique-white-900: #271b0c;
+  --color-antique-white-950: #1b1308;
+  
+  --color-bright-blue-50: #e6f5fe;
+  --color-bright-blue-100: #cdebfe;
+  --color-bright-blue-200: #9bd7fd;
+  --color-bright-blue-300: #69c4fc;
+  --color-bright-blue-400: #37b0fb;
+  --color-bright-blue-500: #059cfa;
+  --color-bright-blue-600: #047dc8; /* base */
+  --color-bright-blue-700: #035e96;
+  --color-bright-blue-800: #023e64;
+  --color-bright-blue-900: #011f32;
+  --color-bright-blue-950: #011623;      
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Zilla Slab", serif;
+}
+
+
+/* ------------------- FONTS ------------------- */
+
+/* Zilla Slab */
+.zilla-slab-light {
+  font-family: "Zilla Slab", serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.zilla-slab-regular {
+  font-family: "Zilla Slab", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.zilla-slab-medium {
+  font-family: "Zilla Slab", serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.zilla-slab-semibold {
+  font-family: "Zilla Slab", serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.zilla-slab-bold {
+  font-family: "Zilla Slab", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.zilla-slab-medium-italic {
+  font-family: "Zilla Slab", serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* <weight>: Use a value from 200 to 1000
+/* <uniquifier>: Use a unique and descriptive class name */
+
+.nunito-sans-bold {
+  font-family: "Nunito Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100,
+    "YTLC" 500;
+}
+
+.nunito-sans-medium {
+  font-family: "Nunito Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100,
+    "YTLC" 500;
+}
+
+.nunito-sans-semibold {
+  font-family: "Nunito Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100,
+    "YTLC" 500;
+}
+
+.nunito-sans-regular {
+  font-family: "Nunito Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100,
+    "YTLC" 500;
+}
