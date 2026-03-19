@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Brewing Buddy
 
-## Getting Started
+A web app for homebrewers to track mead and wine batches through the fermentation process. Replace paper sheets and spreadsheets with an organized, intuitive dashboard and check-up flow.
 
-First, run the development server:
+## Features
+
+- **Dashboard** – View all active batches as cards; add and remove batches.
+- **New batch** – Label, photo, ingredients, equipment, starting specific gravity. Optional check interval (default weekly).
+- **Check-ups** – Record specific gravity, ingredient changes, equipment used, and notes. Dates stored for every check.
+- **Next check** – App suggests when the next check is due; user can override.
+- **Reminders** – Email reminders for upcoming checks (when configured).
+- **History** – Past batches and check data kept for reference.
+
+## Tech stack
+
+- **Next.js 16** (App Router), **React 19**, **TypeScript**
+- **Tailwind CSS 4** for styling
+- Fonts: Zilla Slab, Nunito Sans
+
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env.local   # optional: add keys when you need DB/email
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Repository structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+  app/
+    page.tsx              # Dashboard (batch cards, add/remove)
+    layout.tsx
+    globals.css
+    components/           # Navbar, BatchCard, forms, etc.
+    api/                  # API routes: batches, checks, reminders
+    batches/              # Routes: [id], new, etc.
+  lib/
+    db/                   # Data access (in-memory → DB later)
+    utils/                # Helpers (e.g. next-check date)
+    email/                # Optional: reminder sending
+  types/
+    index.ts              # Batch, Check, Ingredient, Equipment
+  hooks/                  # useBatches, useBatch, mutations
+```
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command   | Description        |
+|----------|--------------------|
+| `npm run dev`   | Start dev server   |
+| `npm run build` | Production build   |
+| `npm run start` | Run production     |
+| `npm run lint`  | Run ESLint         |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## User constraints (from spec)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Incomplete data** – The app tolerates partial check-up inputs (e.g. gravity only, or notes only).
+- **Irregular schedules** – Users can override the next check date.
+- **Terminology** – UI should stay clear for users unfamiliar with brewing terms (consider tooltips or a small glossary later).
 
-## Deploy on Vercel
+## Future ideas
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Recipe sharing and scaling to more stakeholders (e.g. competition judges).
+- Optional export of batch history (PDF/CSV).

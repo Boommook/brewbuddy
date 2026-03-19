@@ -1,0 +1,11 @@
+import BatchCard from "./BatchCard";
+
+export default function Dashboard() {
+  return (
+    <div className="my-4 mx-8 flex">
+        <div className="w-full flex-1 justify-center items-center grid grid-cols-3 gap-12">
+            <BatchCard id="1" title="Batch 1" type="Melomel" stage="Primary" image="/img/banana_mead.jpg" abv={10} favourite={true} createdAt={new Date()} lastCheckedAt={new Date()} OG={1.050} FG={1.010} />
+        </div>
+    </div>
+  );
+}
