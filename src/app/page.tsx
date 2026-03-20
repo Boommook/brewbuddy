@@ -3,7 +3,7 @@ import Dashboard from "./components/Dashboard";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen bg-camel-300 font-sans">
+    <div className="flex h-full font-sans">
         <Dashboard />
     </div>
   );

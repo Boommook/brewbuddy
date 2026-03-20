@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,11 +33,17 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-camel-300`}
       >
+        <div className="sticky top-0 z-50 shadow-lg shadow-[#888]">
         <Navbar />
-        {children}
-      </body>
+        </div>
+        
+        <main className="honeycomb-bg flex-1">
+          <TooltipProvider>{children}</TooltipProvider>
+        </main>
+    
+          </body>
     </html>
   );
 }

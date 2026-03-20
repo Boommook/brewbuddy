@@ -282,6 +282,15 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.button-style {
+  @apply hover:scale-110 hover:cursor-pointer;
+}
+
+.honeycomb-bg {
+  background-color: #c4b8a1;
+  background-image: url("/img/Hexgon-Pattern.svg");
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
