@@ -17,14 +17,14 @@ export default function BatchCard({ title, type, image, stage, abv, favourite, c
     return (
     <div className="hover:cursor-pointer shadow-lg shadow-[#888] rounded-xl">
         <Tooltip>
-            <TooltipTrigger className="block w-full text-left" asChild>
+            <TooltipTrigger className="block w-full text-left">
                 <div className={`${headerBg} border-2 ${borderColor} rounded-t-lg backdrop-blur-lg px-4 py-2 flex justify-between items-center`}>
                     <div className="flex flex-col">
                         <h2 className="text-2xl text-white font-bold">{title}</h2>
                         <div className="text-lg text-gray-200 flex gap-2">
-                            <Tooltip><TooltipTrigger asChild><p>{type}</p></TooltipTrigger><TooltipContent><p>The type of mead brewing.</p></TooltipContent></Tooltip>
+                            <Tooltip><TooltipTrigger><p>{type}</p></TooltipTrigger><TooltipContent><p>The type of mead brewing.</p></TooltipContent></Tooltip>
                             <p> | </p>
-                            <Tooltip><TooltipTrigger asChild><p>{stage}</p></TooltipTrigger><TooltipContent><p>The stage of fermentation.</p></TooltipContent></Tooltip>
+                            <Tooltip><TooltipTrigger><p>{stage}</p></TooltipTrigger><TooltipContent><p>The stage of fermentation.</p></TooltipContent></Tooltip>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
