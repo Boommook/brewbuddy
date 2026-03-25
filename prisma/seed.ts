@@ -11,7 +11,7 @@ const adapter = new PrismaPg({
   connectionString: databaseUrl
 })
 
-const prisma = new PrismaClient({ adapter, errorFormat: 'colorless' })
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
   await prisma.ingredient.createMany({

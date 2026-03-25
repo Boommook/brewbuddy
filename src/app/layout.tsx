@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import { getUserId } from "../server/auth";
 import { TooltipProvider } from "@/components/ui/tooltip"
 
 const geistSans = Geist({
@@ -19,11 +20,12 @@ export const metadata: Metadata = {
   description: "Track your mead and wine batches through fermentation—gravity, ingredients, equipment, and check-up reminders.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const userId = await getUserId();
   return (
     <html lang="en">
       <head>
@@ -35,9 +37,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-camel-300`}
       >
-        <div className="sticky top-0 z-50 shadow-lg shadow-[#888]">
+        {userId && <div className="sticky top-0 z-50 shadow-lg shadow-[#888]">
         <Navbar />
-        </div>
+        </div>}
         
         <main className="honeycomb-bg flex-1">
           <TooltipProvider>{children}</TooltipProvider>

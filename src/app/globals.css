@@ -112,6 +112,7 @@
   --color-antique-white-800: #4e3618;
   --color-antique-white-900: #271b0c;
   --color-antique-white-950: #1b1308;
+  --color-antique-white-input: #efe0ce;
 
   --color-bright-blue: #047dc8;
   --color-bright-blue-50: #e6f5fe;
@@ -124,7 +125,10 @@
   --color-bright-blue-700: #035e96;
   --color-bright-blue-800: #023e64;
   --color-bright-blue-900: #011f32;
-  --color-bright-blue-950: #011623;      
+  --color-bright-blue-950: #011623;
+
+  /* Tailwind v4 default theme stops at inset-shadow-sm; extend for auth inputs */
+  --inset-shadow-md: inset 0 1px 6px rgba(0, 0, 0, 0.1);
 }
 
 body {
@@ -284,6 +288,11 @@ body {
 
 .button-style {
   @apply hover:scale-110 hover:cursor-pointer;
+}
+
+.auth-input-style {
+  @apply rounded-md border border-camel-400 px-3 py-2 bg-antique-white-input  text-gray-900 inset-shadow-md
+  focus:outline-none focus:ring-0.5 focus:ring-bright-blue;
 }
 
 .honeycomb-bg {

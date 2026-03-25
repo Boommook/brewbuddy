@@ -10,7 +10,7 @@ import {
 export default function BatchCard({ title, type, image, stage, abv, favourite, createdAt, lastCheckedAt, OG, FG }: BatchCardProps) {
     
     const urgency = 7 - Math.floor((new Date().getTime() - lastCheckedAt.getTime()) / (1000 * 60 * 60 * 24));
-    console.log(urgency);
+    //console.log(urgency); // old log for debugging
     const borderColor = urgency > 0 ? urgency > 3 ? urgency > 5 ? "border-green-700" : "border-yellow-700" : "border-orange-700" : "border-red-700";
     const headerBg = urgency > 0 ? urgency > 3 ? urgency > 5 ? "bg-green-700/50" : "bg-yellow-600/50" : "bg-orange-600/50" : "bg-red-600/50";
     

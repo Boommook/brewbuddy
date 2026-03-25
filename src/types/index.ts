@@ -1,12 +1,39 @@
-/**
- * Brewing Buddy – shared types for batches, checks, and related data.
- * Tolerates partial/incomplete check-up inputs per requirements.
- */
+// shared types: prisma-aligned dtos live in named modules; this file re-exports
+// them and keeps ui / mock shapes separate from generated enums.
 
-export type BatchStatus = "active" | "archived" | "completed";
-export type BatchType = "mead" | "wine" | "cider" | "other";
-export type BatchSubtype = "melomel" | "honey" | "tea" | "other";
-export type BatchStage = "Primary Fermentation" | "Secondary Fermentation" | "Aging" | "Completed";
+export type {
+  BatchDTO,
+  CreateBatchInput,
+  UpdateBatchInput,
+  DashboardBatchListRow,
+} from "./batch";
+
+export type {
+  IngredientDTO,
+  CreateIngredientInput,
+  UpdateIngredientInput,
+} from "./ingredient";
+
+export type {
+  BatchIngredientAdditionDTO,
+  CreateBatchIngredientAdditionInput,
+  UpdateBatchIngredientAdditionInput,
+  BatchEventDTO,
+  CreateBatchEventInput,
+  BatchMeasurementDTO,
+  CreateBatchMeasurementInput,
+} from "./fermentation";
+
+// --- ui & legacy mock shapes (not prisma models) ---
+
+export type UiBatchLifecycleStatus = "active" | "archived" | "completed";
+export type UiBatchKind = "mead" | "wine" | "cider" | "other";
+export type UiBatchSubtype = "melomel" | "honey" | "tea" | "other";
+export type UiFermentationStageLabel =
+  | "Primary Fermentation"
+  | "Secondary Fermentation"
+  | "Aging"
+  | "Completed";
 
 export interface BatchCardProps {
   id: string;
@@ -22,71 +49,66 @@ export interface BatchCardProps {
   FG: number;
 }
 
-export interface Ingredient {
+export interface IngredientLine {
   id: string;
   name: string;
   amount?: string;
   unit?: string;
-  addedAt?: string; // ISO date
-  removedAt?: string; // ISO date, for removals during checks
+  addedAt?: string;
+  removedAt?: string;
 }
 
 export interface Equipment {
   id: string;
   name: string;
-  usedAt?: string; // ISO date
+  usedAt?: string;
 }
 
 export interface GravityReading {
-  value: number; // e.g. 1.050
-  date: string;   // ISO date
+  value: number;
+  date: string;
   note?: string;
 }
 
 export interface BatchCheck {
   id: string;
   batchId: string;
-  date: string;           // ISO date
+  date: string;
   specificGravity?: number;
-  ingredientsAdded?: Ingredient[];
-  ingredientsRemoved?: string[]; // ids or names
+  ingredientsAdded?: IngredientLine[];
+  ingredientsRemoved?: string[];
   equipmentUsed?: Equipment[];
   notes?: string;
 }
 
-export interface Batch {
+// legacy rich mock shape for prototypes; prefer `BatchDTO` for API data.
+export interface MockBatchDetail {
   id: string;
   label: string;
   photoUrl?: string;
-  status: BatchStatus;
-  /** Starting specific gravity (e.g. 1.050) */
+  status: UiBatchLifecycleStatus;
   startingGravity: number;
-  /** Ingredients at batch creation */
-  ingredients: Ingredient[];
-  /** Equipment used for this batch */
+  ingredients: IngredientLine[];
   equipment: Equipment[];
-  /** All gravity readings over time */
   gravityReadings: GravityReading[];
-  /** All recorded check-ups */
   checks: BatchCheck[];
-  /** Next check due (ISO date); user can override */
   nextCheckDue: string;
-  /** Check interval in days; used to calculate next check */
   checkIntervalDays: number;
   createdAt: string;
   updatedAt: string;
 }
 
-/** Input when creating a new batch */
-export type CreateBatchInput = Pick<Batch, "label" | "startingGravity" | "ingredients" | "equipment"> & {
+export type MockBatchCreateInput = Pick<
+  MockBatchDetail,
+  "label" | "startingGravity" | "ingredients" | "equipment"
+> & {
   photo?: File | string;
   checkIntervalDays?: number;
 };
 
-/** Input for a single check-up (all fields optional for partial inputs) */
 export type CheckInput = Partial<{
   specificGravity: number;
-  ingredientsAdded: Ingredient[];
+  ingredientsAdded: IngredientLine[];
   ingredientsRemoved: string[];
   equipmentUsed: Equipment[];
   notes: string;

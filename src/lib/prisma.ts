@@ -17,7 +17,7 @@ const adapter =
   new PrismaPg({ connectionString: databaseUrl })
 
 export const prisma =
-  globalForPrisma.prisma ?? new PrismaClient({ adapter, errorFormat: 'colorless' })
+  globalForPrisma.prisma ?? new PrismaClient({ adapter })
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma
