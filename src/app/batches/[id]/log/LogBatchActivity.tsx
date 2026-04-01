@@ -14,6 +14,20 @@ import {
   measurementHint,
 } from "@/src/lib/batchLogOptions";
 
+const STAGE_REQUIRED_EVENTS = new Set<string>(["STABILIZED", "TRANSFERRED"]);
+
+const BATCH_STAGE_OPTIONS: { value: string; label: string }[] = [
+  { value: "PLANNING", label: "Planning" },
+  { value: "PRIMARY", label: "Primary fermentation" },
+  { value: "SECONDARY", label: "Secondary fermentation" },
+  { value: "BULK_AGING", label: "Bulk aging" },
+  { value: "STABILIZING", label: "Stabilizing" },
+  { value: "BACKSWEETENING", label: "Backsweetening" },
+  { value: "PACKAGING", label: "Packaging" },
+  { value: "CONDITIONING", label: "Conditioning" },
+  { value: "DONE", label: "Done" },
+];
+
 const CUSTOM_VALUE = "__custom__";
 
 type AdditionRow = {
@@ -62,6 +76,8 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
   );
   const [rows, setRows] = useState<AdditionRow[]>([]);
 
+  const [newStage, setNewStage] = useState<string>("");
+
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -70,6 +86,9 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
   const eventType = !isMeasurement ? logSelect.slice(2) : "";
   const showIngredients =
     !isMeasurement && eventTypeSupportsIngredients(eventType);
+
+  const requiresNewStage =
+    !isMeasurement && STAGE_REQUIRED_EVENTS.has(eventType);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,6 +132,7 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
       if (!eventTypeSupportsIngredients(v.slice(2))) {
         setRows([]);
       }
+      setNewStage("");
     }
   };
 
@@ -216,6 +236,11 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
         return;
       }
 
+      if (requiresNewStage && !newStage) {
+        setFormError("Select the new batch stage for this event.");
+        return;
+      }
+
       let additionsPayload: ReturnType<typeof buildAdditionsPayload> | undefined;
       if (showIngredients) {
         try {
@@ -234,6 +259,7 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
         title: t,
         description: eventDescription.trim() || null,
         occurredAt: iso,
+        ...(requiresNewStage && newStage ? { newStage } : {}),
         ...(showIngredients && additionsPayload && additionsPayload.length > 0
           ? { additions: additionsPayload }
           : {}),
@@ -383,6 +409,29 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
                 placeholder="Details, observations, next steps…"
               />
             </label>
+            {requiresNewStage ? (
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-semibold text-gray-800">
+                  New batch stage
+                </span>
+                <select
+                  className="auth-input-style w-full"
+                  value={newStage}
+                  onChange={(e) => setNewStage(e.target.value)}
+                >
+                  <option value="">— Select stage —</option>
+                  {BATCH_STAGE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-xs text-gray-600">
+                  When a batch is stabilized or transferred/racked, choose what
+                  stage it moves into next.
+                </span>
+              </label>
+            ) : null}
           </div>
         )}
 
@@ -547,7 +596,7 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
           <Button
             type="submit"
             disabled={submitting}
-            className="bg-golden-orange-600 hover:bg-golden-orange-700 border-none text-white shadow-style button-style"
+            className="bg-golden-orange-600 hover:bg-golden-orange-700 text-golden-orange-100 shadow-style button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-700"
           >
             {submitting ? (
               <>
@@ -563,7 +612,7 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
             variant="outline"
             onClick={() => router.push("/")}
             disabled={submitting}
-            className="shadow-style border-none bg-red-200 hover:bg-red-300 button-style"
+            className="shadow-style bg-cayenne-red hover:bg-cayenne-red-700 button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-800 text-golden-orange-100 hover:text-golden-orange-100"
           >
             Cancel
           </Button>

@@ -701,7 +701,8 @@ export default function CreateBatch() {
             <Button
               type="submit"
               disabled={submitting}
-              className="bg-golden-orange-600 hover:bg-golden-orange-700 border-none text-white shadow-style button-style"
+              className="bg-golden-orange-600 hover:bg-golden-orange-700 
+              text-white shadow-style button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-700"
             >
               {submitting ? (
                 <>
@@ -717,7 +718,7 @@ export default function CreateBatch() {
               variant="outline"
               onClick={() => router.push("/")}
               disabled={submitting}
-              className="shadow-style bg-red-200 hover:bg-red-300 border-none button-style"
+              className="shadow-style bg-cayenne-red hover:bg-cayenne-red-700 button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-800 text-golden-orange-100 hover:text-golden-orange-200"
             >
               Cancel
             </Button>

@@ -50,14 +50,14 @@ export function LoginForm() {
       </div>
 
       <Button type="submit" 
-      className="mt-2 w-full hover:cursor-pointer bg-cayenne-red-700 hover:bg-cayenne-red-800"
+      className="shadow-md mt-2 w-full hover:cursor-pointer hover:bg-cayenne-red-700 border-2 border-cayenne-red-700 hover:border-cayenne-red-800 bg-cayenne-red-600 text-golden-orange-200 nunito-sans-bold"
        disabled={pending}>
         {pending ? "Signing in…" : "Log in"}
       </Button>
 
       <p className="text-center text-sm text-gray-600">
         No account?{" "}
-        <Link href="/register" className="font-medium underline text-golden-orange-700">
+        <Link href="/register" className="font-medium underline text-bright-blue-700">
           Register
         </Link>
       </p>

@@ -5,6 +5,7 @@ import { getUserId } from "./auth";
 import type { CreateBatchAdditionPayload } from "../types/batch";
 import { normalizeAdditions } from "./batches";
 import {
+  BatchStage,
   EventType,
   type MeasurementType,
 } from "../generated/prisma/index.js";
@@ -69,6 +70,7 @@ export async function createBatchEventLog(input: {
   description?: string | null;
   occurredAt: Date;
   additions?: CreateBatchAdditionPayload[] | undefined;
+  newStage?: BatchStage | null;
 }) {
   const userId = await getUserId();
   if (!userId) throw new Error("User not found");
@@ -142,7 +144,10 @@ export async function createBatchEventLog(input: {
 
     await tx.batch.update({
       where: { id: input.batchId },
-      data: { updatedAt: new Date() },
+      data: {
+        updatedAt: new Date(),
+        ...(input.newStage ? { currentStage: input.newStage } : {}),
+      },
     });
     return e;
   });

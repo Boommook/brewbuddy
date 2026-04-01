@@ -94,6 +94,10 @@ export async function updateBatchFavorite(batchId: string, isFavorite: boolean) 
   return updateBatch(batchId, { isFavorite });
 }
 
+export async function updateBatchThumbnail(batchId: string, thumbnailImageUrl: string | null) {
+  return updateBatch(batchId, { thumbnailImageUrl });
+}
+
 export async function createNewBatch(input: CreateBatchInput) {
   const userId = await getUserId();
   if (!userId) throw new Error("User not found");

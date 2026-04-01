@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import { deleteBatch, updateBatchFavorite } from "@/src/server/batches";
 
-export async function PUT(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
-  const { id } = await context.params;
+export async function PUT(req: Request){
+  const {id} = await req.json();
   let body: unknown;
   try {
     body = await req.json();
@@ -23,6 +20,7 @@ export async function PUT(
     typeof (body as { isFavorite: unknown }).isFavorite === "boolean"
       ? (body as { isFavorite: boolean }).isFavorite
       : undefined;
+
 
   if (isFavorite === undefined) {
     return NextResponse.json(

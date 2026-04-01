@@ -3,11 +3,16 @@ import {
   createBatchEventLog,
   createBatchMeasurementLog,
 } from "@/src/server/batchLogs";
-import { EventType, MeasurementType } from "@/src/generated/prisma/index.js";
+import {
+  BatchStage,
+  EventType,
+  MeasurementType,
+} from "@/src/generated/prisma/index.js";
 import type { CreateBatchAdditionPayload } from "@/src/types/batch";
 
 const MEASUREMENT_TYPES = new Set<string>(Object.values(MeasurementType));
 const EVENT_TYPES = new Set<string>(Object.values(EventType));
+const BATCH_STAGES = new Set<string>(Object.values(BatchStage));
 
 function parseDate(value: unknown, label: string): Date {
   if (typeof value !== "string" || !value.trim()) {
@@ -112,6 +117,7 @@ export async function POST(
           : null;
       const occurredAtRaw = (body as { occurredAt?: unknown }).occurredAt;
       const additionsRaw = (body as { additions?: unknown }).additions;
+      const newStageRaw = (body as { newStage?: unknown }).newStage;
 
       if (typeof eventType !== "string" || !EVENT_TYPES.has(eventType)) {
         return NextResponse.json(
@@ -137,6 +143,17 @@ export async function POST(
           ? (additionsRaw as CreateBatchAdditionPayload[])
           : undefined;
 
+      let newStage: BatchStage | null = null;
+      if (typeof newStageRaw === "string" && newStageRaw.trim()) {
+        if (!BATCH_STAGES.has(newStageRaw)) {
+          return NextResponse.json(
+            { ok: false, error: "Invalid newStage" },
+            { status: 400 }
+          );
+        }
+        newStage = newStageRaw as BatchStage;
+      }
+
       const row = await createBatchEventLog({
         batchId,
         eventType: eventType as EventType,
@@ -144,6 +161,7 @@ export async function POST(
         description,
         occurredAt,
         additions,
+        newStage,
       });
 
       return NextResponse.json({

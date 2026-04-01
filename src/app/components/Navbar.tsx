@@ -34,14 +34,14 @@ export default async function Navbar() {
             </>
           )}
           <Link href="/createbatch" className="button-style rounded-full">
-            <CirclePlus className="size-10 rounded-full p-1 hover:text-bright-blue-200" />
+            <CirclePlus className="size-10 rounded-full p-1" />
           </Link>
           {user && <form action={signOutAction}>
                 <Button
                   type="submit"
                   className="button-style rounded-full flex items-center bg-transparent justify-center p-1 "
                 >
-                  <LogOut className="size-8 hover:text-bright-blue-200" strokeWidth={2} />
+                  <LogOut className="size-8" strokeWidth={2} />
                 </Button>
               </form>}
         </div>

@@ -35,7 +35,8 @@ export default function BatchCard({
   const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(favourite);
   const [showImageEdit, setShowImageEdit] = useState(false);
-
+  const [thumbnailImageUrl, setThumbnailImageUrl] = useState(image);
+  
   const urgency =
     7 -
     Math.floor(
@@ -102,7 +103,7 @@ export default function BatchCard({
               <div className="text-lg text-gray-200 flex gap-2">
                 <Tooltip>
                   <TooltipTrigger>
-                    <p>{type}</p>
+                    <p className="uppercase">{type}</p>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>The type of mead brewing.</p>
@@ -155,12 +156,12 @@ export default function BatchCard({
       </Tooltip>
 
       <div
-        className="relative overflow-hidden flex flex-col items-center justify-center border-l-2 border-r-2 border-gray-400 
+        className="relative overflow-hidden flex flex-col items-center justify-center border-l-2 border-r-2 border-antique-white-600 
         before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-4 before:bg-linear-to-b before:from-black/30 before:to-transparent after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-4 after:bg-linear-to-t after:from-black/30 after:to-transparent"
         onClick={() => router.push(`/batches/${id}/log`)}
       >
         <Image
-          src={image}
+          src={thumbnailImageUrl}
           alt={title}
           // just use a large value as placeholder
           width={1000}
@@ -181,6 +182,7 @@ export default function BatchCard({
         >
           <SquarePen className="size-4" aria-hidden />
         </Button>
+        {showImageEdit && <ImageEdit batchId={id} setThumbnailImageUrl={setThumbnailImageUrl} setShowImageEdit={setShowImageEdit} />}
       </div>
 
       <div className="flex flex-row bg-camel/75 backdrop-blur-sm border-2 gap-8 nunito-sans-regular justify-between
@@ -201,7 +203,7 @@ export default function BatchCard({
         <Button
           type="button"
           variant="outline"
-          className=" bg-cayenne-red-600 hover:bg-cayenne-red-700 border-2 hover:border-cayenne-red-800 border-cayenne-red-700 text-golden-orange-200 hover:text-gray-230 rounded-full text-lg px-4 py-3
+          className=" bg-cayenne-red-600 hover:bg-cayenne-red-700 border-2 hover:border-cayenne-red-800 border-cayenne-red-700 text-golden-orange-200 hover:text-gray-230 rounded-lg text-lg px-4 py-3
             shadow-style button-style"
           onClick={(e) => {
             e.stopPropagation();
@@ -211,7 +213,6 @@ export default function BatchCard({
           <p>Add Log</p>
         </Button>
       </div>
-      {showImageEdit && <ImageEdit />}
     </div>
   );
 }

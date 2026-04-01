@@ -2,14 +2,22 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
-export default function ImageEdit() {
+interface ImageEditProps {
+    batchId: string;
+    setThumbnailImageUrl: (url: string) => void;
+    setShowImageEdit: (show: boolean) => void;
+}
+
+export default function ImageEdit({ batchId, setThumbnailImageUrl, setShowImageEdit }: ImageEditProps) {
     const [coverImage, setCoverImage] = useState<File | null>(null);
     const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
     const [formError, setFormError] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setFormError(null);
+        setSubmitting(true);
         if(!coverImage) {
             setFormError("Please select an image");
             return;
@@ -17,7 +25,7 @@ export default function ImageEdit() {
 
         const formData = new FormData();
         formData.append("file", coverImage);
-
+            
         try {
             const res = await fetch("/api/uploads/cover-image", {
                 method: "POST",
@@ -28,43 +36,71 @@ export default function ImageEdit() {
             if(!res.ok || !data?.ok || typeof data.url !== "string") {
                 throw new Error("Failed to upload cover image");
             }
-            setCoverImageUrl(data.url);
+            setThumbnailImageUrl(data.url);
+
+            await fetch(`/api/batches/${batchId}/thumbnail`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: batchId, thumbnailImageUrl: data.url })
+            });
         } catch (error) {
             setFormError(error instanceof Error ? error.message : "Failed to upload cover image");
             setCoverImage(null);
             setCoverImageUrl(null);
+            setShowImageEdit(false);
+        } finally {
+            setSubmitting(false);
         }
+        setShowImageEdit(false);
     }
 
     return (
-        <div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-           <label className="flex flex-col gap-1 items-center">
-            <span className="text-sm font-semibold text-gray-800">
-              Cover image
-            </span>
-            {formError && <p className="text-red-500">{formError}</p>}
-            {coverImageUrl && (
-              <img
-                src={coverImageUrl}
-                alt="Cover image"
-                className="w-[50%] border-2 border-antique-white-600 rounded-md"
+        <div
+          className="absolute inset-0 z-20 flex items-center justify-center bg-black/60"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-4 bg-camel-400/95 px-4 py-3 rounded-lg shadow-lg"
+          >
+            <label className="flex flex-col gap-1 items-center">
+              <span className="text-sm font-semibold text-gray-800">
+                Cover image
+              </span>
+              {formError && <p className="text-red-500">{formError}</p>}
+              {coverImageUrl && (
+                <img
+                  src={coverImageUrl}
+                  alt="Cover image"
+                  className="w-1/2 border-2 border-antique-white-600 rounded-md"
+                />
+              )}
+              <Input
+                type="file"
+                className="bg-gray-100 h-fit shadow-md hover:bg-gray-300 rounded-md border-2 hover:cursor-pointer border-gray-500 w-fit"
+                accept="image/*"
+                onChange={(e) => setCoverImage(e.target.files?.[0] ?? null)}
+                placeholder="e.g. cover-image.jpg"
+                autoComplete="off"
               />
-            )}
-            <Input
-              type="file"
-              className="bg-gray-100 h-fit shadow-md hover:bg-gray-300 rounded-md border-2 hover:cursor-pointer border-gray-500 w-fit"
-              accept="image/*"
-              onChange={(e) => setCoverImage(e.target.files?.[0] ?? null)}
-              placeholder="e.g. cover-image.jpg"
-              autoComplete="off"
-            />
-          </label> 
-          <Button type="submit" className="bg-golden-orange-600 hover:bg-golden-orange-700 border-none text-white shadow-style button-style">
-            Save
-          </Button>
+            </label>
+            <div className="flex justify-between gap-4">
+              <Button
+                type="submit"
+                className="bg-golden-orange-600 w-[40%] hover:bg-golden-orange-700 
+                text-white shadow-style button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-700"
+              >
+                {submitting ? "Saving..." : "Save"}
+              </Button>
+              <Button
+                className="shadow-style bg-cayenne-red w-[40%] hover:bg-cayenne-red-700 button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-800"
+                disabled={submitting}
+                onClick={() => setShowImageEdit(false)}>
+                Cancel
+
+              </Button>
+            </div>
           </form>
-          
         </div>
     )
 }
