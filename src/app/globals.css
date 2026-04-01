@@ -217,6 +217,32 @@ body {
     "YTLC" 500;
 }
 
+p div {
+  font-family: "Nunito Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100,
+    "YTLC" 500;
+}
+
+.text-style {
+  font-family: "Nunito Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100,
+    "YTLC" 500;
+}
+
+.heading-style {
+  font-family: "Zilla Slab", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -287,12 +313,20 @@ body {
 }
 
 .button-style {
-  @apply hover:scale-110 hover:cursor-pointer;
+  @apply hover:scale-105 hover:cursor-pointer;
+}
+
+.shadow-style {
+  @apply shadow-md shadow-black/20;
 }
 
 .auth-input-style {
-  @apply rounded-md border border-camel-400 px-3 py-2 bg-antique-white-input  text-gray-900 inset-shadow-md
-  focus:outline-none focus:ring-0.5 focus:ring-bright-blue;
+  @apply rounded-md border border-camel-400 px-3 py-2 bg-antique-white-100  text-gray-900 inset-shadow-md
+  focus:outline-none focus:ring-1 focus:ring-bright-blue;
+}
+
+select {
+  @apply hover:cursor-pointer;
 }
 
 .honeycomb-bg {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { signInWithCredentials } from "../../../../server/auth-credentials";
+import { signInWithCredentials } from "@/src/server/auth-credentials";
 
 export async function POST(req: Request) {
   let body: { username?: unknown; password?: unknown };

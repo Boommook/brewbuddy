@@ -1,0 +1,85 @@
+/** Select values for the batch log UI: `m:` measurement, `e:` event (matches API). */
+
+export const DEFAULT_LOG_SELECT = "m:SPECIFIC_GRAVITY" as const;
+
+export const BATCH_LOG_OPTIONS: { value: string; label: string; group: string }[] =
+  [
+    { value: "m:SPECIFIC_GRAVITY", label: "Specific gravity", group: "Measurements" },
+    { value: "m:BRIX", label: "Brix", group: "Measurements" },
+    { value: "m:PH", label: "pH", group: "Measurements" },
+    { value: "m:TEMPERATURE", label: "Temperature", group: "Measurements" },
+    { value: "m:VOLUME", label: "Volume", group: "Measurements" },
+    { value: "m:ABV_ESTIMATE", label: "ABV (estimate)", group: "Measurements" },
+    { value: "e:PITCHED_YEAST", label: "Pitched yeast", group: "Events" },
+    { value: "e:NUTRIENT_ADDED", label: "Nutrient added", group: "Events" },
+    { value: "e:TRANSFERRED", label: "Transferred", group: "Events" },
+    { value: "e:STABILIZED", label: "Stabilized", group: "Events" },
+    { value: "e:BACKSWEETENED", label: "Backsweetened", group: "Events" },
+    { value: "e:PACKAGED", label: "Packaged", group: "Events" },
+    { value: "e:TASTING_NOTE", label: "Tasting note", group: "Events" },
+    { value: "e:PROBLEM_NOTED", label: "Problem noted", group: "Events" },
+    { value: "e:GENERAL_NOTE", label: "General note", group: "Events" },
+    { value: "e:COMPLETED", label: "Completed", group: "Events" },
+  ];
+
+const EVENT_DEFAULT_TITLE: Record<string, string> = {
+  PITCHED_YEAST: "Pitched yeast",
+  NUTRIENT_ADDED: "Nutrient addition",
+  TRANSFERRED: "Transfer",
+  STABILIZED: "Stabilization",
+  BACKSWEETENED: "Backsweetening",
+  PACKAGED: "Packaging",
+  TASTING_NOTE: "Tasting",
+  PROBLEM_NOTED: "Problem",
+  GENERAL_NOTE: "Note",
+  COMPLETED: "Batch completed",
+};
+
+export function defaultTitleForEventType(eventType: string): string {
+  return EVENT_DEFAULT_TITLE[eventType] ?? "Batch event";
+}
+
+export function defaultUnitForMeasurement(measurementType: string): string {
+  switch (measurementType) {
+    case "BRIX":
+      return "°Bx";
+    case "TEMPERATURE":
+      return "°F";
+    case "VOLUME":
+      return "gal";
+    case "ABV_ESTIMATE":
+      return "%";
+    case "PH":
+    case "SPECIFIC_GRAVITY":
+    default:
+      return "";
+  }
+}
+
+const EVENT_TYPES_WITH_INGREDIENTS = new Set<string>([
+  "STABILIZED",
+  "BACKSWEETENED",
+]);
+
+export function eventTypeSupportsIngredients(eventType: string): boolean {
+  return EVENT_TYPES_WITH_INGREDIENTS.has(eventType);
+}
+
+export function measurementHint(measurementType: string): string {
+  switch (measurementType) {
+    case "SPECIFIC_GRAVITY":
+      return "e.g. 1.042";
+    case "BRIX":
+      return "e.g. 12.5";
+    case "PH":
+      return "e.g. 3.6";
+    case "TEMPERATURE":
+      return "e.g. 68";
+    case "VOLUME":
+      return "e.g. 5";
+    case "ABV_ESTIMATE":
+      return "e.g. 12.5";
+    default:
+      return "";
+  }
+}

@@ -7,6 +7,7 @@ export type BatchScalarFields = Pick<
   | 'userId'
   | 'name'
   | 'category'
+  | 'meadSubtype'
   | 'status'
   | 'currentStage'
   | 'startDate'
@@ -20,6 +21,8 @@ export type BatchScalarFields = Pick<
   | 'notes'
   | 'createdAt'
   | 'updatedAt'
+  | 'thumbnailImageUrl'
+  | 'isFavorite'
 >
 
 function decimalToString(value: Prisma.Decimal | null): string | null {
@@ -30,12 +33,13 @@ function dateToISO(value: Date | null): string | null {
   return value === null ? null : value.toISOString()
 }
 
-export function toBatchDTO(batch: BatchScalarFields) {
+export function toBatchDTO(batch: Batch) {
   return {
     id: batch.id,
     userId: batch.userId,
     name: batch.name,
     category: batch.category,
+    meadSubtype: batch.meadSubtype ?? null,
     status: batch.status,
     currentStage: batch.currentStage,
     startDate: batch.startDate.toISOString(),
@@ -49,5 +53,7 @@ export function toBatchDTO(batch: BatchScalarFields) {
     notes: batch.notes,
     createdAt: batch.createdAt.toISOString(),
     updatedAt: batch.updatedAt.toISOString(),
-  }
+    thumbnailImageUrl: batch.thumbnailImageUrl,
+    isFavorite: batch.isFavorite,
+  };
 }

@@ -16,6 +16,29 @@ enum BrewCategory {
   OTHER
 }
 
+enum MeadSubtype {
+  ACERGLYN
+  BRAGGOT
+  BOCHET
+  CAPSICUMEL
+  CYSER
+  SACK_MEAD
+  HIPPOCRAS
+  HYDROMEL
+  METHEGLIN
+  MORAT
+  MELOMEL
+  MULLED_MEAD
+  OMPHACOMEL
+  OXYMEL
+  PYMENT
+  RHODOMEL
+  SHORT_MEAD
+  SHOW_MEAD
+  SPARKLING_MEAD
+  SOUR_MEAD
+}
+
 enum BatchStatus {
   PLANNED
   ACTIVE
@@ -86,75 +109,79 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  batches      Batch[]
-  ingredients  Ingredient[]
+  batches     Batch[]
+  ingredients Ingredient[]
 }
 
 model Ingredient {
-  id             String                  @id @default(uuid()) @db.Uuid
-  userId         String?                 @db.Uuid
+  id             String         @id @default(uuid()) @db.Uuid
+  userId         String?        @db.Uuid
   name           String
   ingredientType IngredientType
   brand          String?
   defaultUnit    String?
   notes          String?
-  isGlobal       Boolean                 @default(false)
-  isArchived     Boolean                 @default(false)
-  createdAt      DateTime                @default(now())
-  updatedAt      DateTime                @updatedAt
+  isGlobal       Boolean        @default(false)
+  isArchived     Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
-  user           User?                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  additions      BatchIngredientAddition[]
+  user      User?                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  additions BatchIngredientAddition[]
 
   @@index([userId])
   @@index([name])
 }
 
 model Batch {
-  id              String                  @id @default(uuid()) @db.Uuid
-  userId          String                  @db.Uuid
-  name            String
-  category        BrewCategory
-  status          BatchStatus             @default(PLANNED)
-  currentStage    BatchStage              @default(PLANNING)
-  startDate       DateTime
-  brewDate        DateTime?
-  completedDate   DateTime?
-  targetVolume    Decimal?                @db.Decimal(10, 3)
-  actualVolume    Decimal?                @db.Decimal(10, 3)
-  originalGravity Decimal?                @db.Decimal(6, 3)
-  finalGravity    Decimal?                @db.Decimal(6, 3)
-  calculatedABV   Decimal?                @db.Decimal(5, 2)
-  notes           String?
-  createdAt       DateTime                @default(now())
-  updatedAt       DateTime                @updatedAt
+  id                String       @id @default(uuid()) @db.Uuid
+  userId            String       @db.Uuid
+  name              String
+  category          BrewCategory
+  meadSubtype       MeadSubtype?
+  status            BatchStatus  @default(PLANNED)
+  currentStage      BatchStage   @default(PLANNING)
+  startDate         DateTime
+  brewDate          DateTime?
+  completedDate     DateTime?
+  targetVolume      Decimal?     @db.Decimal(10, 3)
+  actualVolume      Decimal?     @db.Decimal(10, 3)
+  originalGravity   Decimal?     @db.Decimal(6, 3)
+  finalGravity      Decimal?     @db.Decimal(6, 3)
+  calculatedABV     Decimal?     @db.Decimal(5, 2)
+  thumbnailImageUrl String?
+  isFavorite        Boolean      @default(false)
+  notes             String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 
-  user            User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  additions       BatchIngredientAddition[]
-  events          BatchEvent[]
-  measurements    BatchMeasurement[]
+  user         User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  additions    BatchIngredientAddition[]
+  events       BatchEvent[]
+  measurements BatchMeasurement[]
 
   @@index([userId])
   @@index([status])
   @@index([currentStage])
+  @@index([isFavorite])
 }
 
-model BatchIngredientAddition {
-  id                   String      @id @default(uuid()) @db.Uuid
-  batchId              String      @db.Uuid
-  ingredientId         String?     @db.Uuid
+model BatchIngredientAddition {   
+  id                   String    @id @default(uuid()) @db.Uuid
+  batchId              String    @db.Uuid
+  ingredientId         String?   @db.Uuid
   customIngredientName String?
-  amount               Decimal     @db.Decimal(10, 3)
+  amount               Decimal   @db.Decimal(10, 3)
   unit                 String
   purpose              String?
   additionType         String?
   addedAt              DateTime?
   notes                String?
-  createdAt            DateTime    @default(now())
-  updatedAt            DateTime    @updatedAt
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
-  batch                Batch       @relation(fields: [batchId], references: [id], onDelete: Cascade)
-  ingredient           Ingredient? @relation(fields: [ingredientId], references: [id], onDelete: SetNull)
+  batch      Batch       @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  ingredient Ingredient? @relation(fields: [ingredientId], references: [id], onDelete: SetNull)
 
   @@index([batchId])
   @@index([ingredientId])
@@ -169,23 +196,23 @@ model BatchEvent {
   occurredAt  DateTime
   createdAt   DateTime  @default(now())
 
-  batch       Batch     @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  batch Batch @relation(fields: [batchId], references: [id], onDelete: Cascade)
 
   @@index([batchId])
   @@index([occurredAt])
 }
 
 model BatchMeasurement {
-  id               String          @id @default(uuid()) @db.Uuid
-  batchId          String          @db.Uuid
-  measurementType  MeasurementType
-  value            Decimal         @db.Decimal(10, 3)
-  unit             String?
-  measuredAt       DateTime
-  note             String?
-  createdAt        DateTime        @default(now())
+  id              String          @id @default(uuid()) @db.Uuid
+  batchId         String          @db.Uuid
+  measurementType MeasurementType
+  value           Decimal         @db.Decimal(10, 3)
+  unit            String?
+  measuredAt      DateTime
+  note            String?
+  createdAt       DateTime        @default(now())
 
-  batch            Batch           @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  batch Batch @relation(fields: [batchId], references: [id], onDelete: Cascade)
 
   @@index([batchId])
   @@index([measurementType])

@@ -11,6 +11,12 @@ export type BatchDTO = {
   userId: string;
   name: string;
   category: BrewCategory;
+  /**
+   * Optional mead subtype enum string; only set when `category === "MEAD"`.
+   * Kept as a plain string here so the type remains compatible even if
+   * Prisma client hasn't been regenerated yet.
+   */
+  meadSubtype: string | null;
   status: BatchStatus;
   currentStage: BatchStage;
   startDate: string;
@@ -21,14 +27,29 @@ export type BatchDTO = {
   originalGravity: string | null;
   finalGravity: string | null;
   calculatedABV: string | null;
+  thumbnailImageUrl: string | null;
+  isFavorite: boolean;
   notes: string | null;
   createdAt: string;
   updatedAt: string;
 };
 
+/** One ingredient line when creating a batch (no batchId; applied server-side). */
+export type CreateBatchAdditionPayload = {
+  ingredientId?: string | null;
+  customIngredientName?: string | null;
+  amount: number;
+  unit: string;
+  purpose?: string | null;
+  notes?: string | null;
+};
+
 export type CreateBatchInput = {
   name: string;
   category: BrewCategory;
+  /** Optional mead subtype; only used when category is MEAD. */
+  meadSubtype?: string | null;
+  thumbnailImageUrl?: string | null;
   // iso 8601; defaults to current instant server-side if omitted.
   startDate?: string;
   targetVolume?: number | null;
@@ -38,11 +59,15 @@ export type CreateBatchInput = {
   brewDate?: string | null;
   originalGravity?: number | null;
   notes?: string | null;
+  additions?: CreateBatchAdditionPayload[];
 };
 
 export type UpdateBatchInput = {
   name?: string;
   category?: BrewCategory;
+  /** Optional mead subtype; only used when category is MEAD. */
+  meadSubtype?: string | null;
+  thumbnailImageUrl?: string | null;
   startDate?: string;
   targetVolume?: number | null;
   status?: BatchStatus;

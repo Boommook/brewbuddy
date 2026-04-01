@@ -4,6 +4,7 @@
 export type {
   BatchDTO,
   CreateBatchInput,
+  CreateBatchAdditionPayload,
   UpdateBatchInput,
   DashboardBatchListRow,
 } from "./batch";

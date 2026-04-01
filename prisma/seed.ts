@@ -13,20 +13,126 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter })
 
-async function main() {
-  await prisma.ingredient.createMany({
-    data: [
-      { name: 'Wildflower Honey', ingredientType: IngredientType.HONEY, defaultUnit: 'lb', isGlobal: true },
-      { name: 'Orange Blossom Honey', ingredientType: IngredientType.HONEY, defaultUnit: 'lb', isGlobal: true },
-      { name: 'Water', ingredientType: IngredientType.WATER, defaultUnit: 'gal', isGlobal: true },
-      { name: '71B', ingredientType: IngredientType.YEAST, defaultUnit: 'g', isGlobal: true, brand: 'Lalvin' },
-      { name: 'ICV K1-V1116', ingredientType: IngredientType.YEAST, defaultUnit: 'g', isGlobal: true, brand: 'Lalvin' },
-      { name: 'ICV-D47', ingredientType: IngredientType.YEAST, defaultUnit: 'g', isGlobal: true, brand: 'Lalvin' },
-      { name: 'Fermaid O', ingredientType: IngredientType.NUTRIENT, defaultUnit: 'g', isGlobal: true },
-      { name: 'Blueberries', ingredientType: IngredientType.FRUIT, defaultUnit: 'lb', isGlobal: true }
-    ],
-    skipDuplicates: true
+type SeedIngredient = {
+  name: string
+  ingredientType: IngredientType
+  brand?: string | null
+  defaultUnit?: string | null
+  notes?: string | null
+}
+
+const GLOBAL_INGREDIENTS: SeedIngredient[] = [
+  // Honey
+  { name: 'Wildflower Honey', ingredientType: IngredientType.HONEY, defaultUnit: 'lb' },
+  { name: 'Orange Blossom Honey', ingredientType: IngredientType.HONEY, defaultUnit: 'lb' },
+  { name: 'Clover Honey', ingredientType: IngredientType.HONEY, defaultUnit: 'lb' },
+  { name: 'Buckwheat Honey', ingredientType: IngredientType.HONEY, defaultUnit: 'lb' },
+  { name: 'Acacia Honey', ingredientType: IngredientType.HONEY, defaultUnit: 'lb' },
+  { name: 'Meadowfoam Honey', ingredientType: IngredientType.HONEY, defaultUnit: 'lb' },
+  { name: 'Goldenrod Honey', ingredientType: IngredientType.HONEY, defaultUnit: 'lb' },
+  { name: 'Avocado Honey', ingredientType: IngredientType.HONEY, defaultUnit: 'lb' },
+  // Water
+  { name: 'Tap Water', ingredientType: IngredientType.WATER, defaultUnit: 'gal' },
+  { name: 'Spring Water', ingredientType: IngredientType.WATER, defaultUnit: 'gal' },
+  { name: 'RO / Distilled Water', ingredientType: IngredientType.WATER, defaultUnit: 'gal' },
+  // Yeast — wine & mead
+  { name: '71B-1122', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'Lalvin' },
+  { name: 'ICV K1-V1116', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'Lalvin' },
+  { name: 'D-47', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'Lalvin' },
+  { name: 'EC-1118', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'Lalvin' },
+  { name: 'RC-212', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'Lalvin' },
+  { name: 'BM 4×4', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'Lalvin' },
+  // Yeast — beer / general
+  { name: 'US-05', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'SafAle' },
+  { name: 'S-04', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'SafAle' },
+  { name: 'Nottingham', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'Lallemand' },
+  { name: 'Belle Saison', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'Lallemand' },
+  { name: 'W34/70', ingredientType: IngredientType.YEAST, defaultUnit: 'g', brand: 'Saflager' },
+  // Nutrients
+  { name: 'Fermaid O', ingredientType: IngredientType.NUTRIENT, defaultUnit: 'g' },
+  { name: 'Fermaid K', ingredientType: IngredientType.NUTRIENT, defaultUnit: 'g' },
+  { name: 'DAP (Diammonium Phosphate)', ingredientType: IngredientType.NUTRIENT, defaultUnit: 'g' },
+  { name: 'Go-Ferm Protect', ingredientType: IngredientType.NUTRIENT, defaultUnit: 'g' },
+  { name: 'Springcell / Yeast Energizer (generic)', ingredientType: IngredientType.NUTRIENT, defaultUnit: 'g' },
+  // Fruit
+  { name: 'Blueberries (fresh)', ingredientType: IngredientType.FRUIT, defaultUnit: 'lb' },
+  { name: 'Blackberries (fresh)', ingredientType: IngredientType.FRUIT, defaultUnit: 'lb' },
+  { name: 'Raspberries (fresh)', ingredientType: IngredientType.FRUIT, defaultUnit: 'lb' },
+  { name: 'Strawberries (fresh)', ingredientType: IngredientType.FRUIT, defaultUnit: 'lb' },
+  { name: 'Cherries (sweet, pitted)', ingredientType: IngredientType.FRUIT, defaultUnit: 'lb' },
+  { name: 'Apple Juice / Cider', ingredientType: IngredientType.FRUIT, defaultUnit: 'gal' },
+  { name: 'Peaches (fresh)', ingredientType: IngredientType.FRUIT, defaultUnit: 'lb' },
+  { name: 'Grape concentrate (wine)', ingredientType: IngredientType.FRUIT, defaultUnit: 'L' },
+  // Spice
+  { name: 'Cinnamon sticks', ingredientType: IngredientType.SPICE, defaultUnit: 'each' },
+  { name: 'Whole cloves', ingredientType: IngredientType.SPICE, defaultUnit: 'g' },
+  { name: 'Vanilla bean', ingredientType: IngredientType.SPICE, defaultUnit: 'each' },
+  { name: 'Allspice berries', ingredientType: IngredientType.SPICE, defaultUnit: 'g' },
+  { name: 'Star anise', ingredientType: IngredientType.SPICE, defaultUnit: 'each' },
+  // Herb
+  { name: 'Chamomile (dried)', ingredientType: IngredientType.HERB, defaultUnit: 'g' },
+  { name: 'Rose hips (dried)', ingredientType: IngredientType.HERB, defaultUnit: 'g' },
+  { name: 'Elderflower (dried)', ingredientType: IngredientType.HERB, defaultUnit: 'g' },
+  { name: 'Hibiscus (dried)', ingredientType: IngredientType.HERB, defaultUnit: 'g' },
+  // Acid
+  { name: 'Acid blend', ingredientType: IngredientType.ACID, defaultUnit: 'tsp' },
+  { name: 'Malic acid', ingredientType: IngredientType.ACID, defaultUnit: 'g' },
+  { name: 'Tartaric acid', ingredientType: IngredientType.ACID, defaultUnit: 'g' },
+  { name: 'Citric acid', ingredientType: IngredientType.ACID, defaultUnit: 'g' },
+  // Tannin
+  { name: 'Grape tannin powder', ingredientType: IngredientType.TANNIN, defaultUnit: 'tsp' },
+  { name: 'Strong black tea (tannin)', ingredientType: IngredientType.TANNIN, defaultUnit: 'bag' },
+  // Sugar
+  { name: 'Table sugar (sucrose)', ingredientType: IngredientType.SUGAR, defaultUnit: 'lb' },
+  { name: 'Brown sugar', ingredientType: IngredientType.SUGAR, defaultUnit: 'lb' },
+  { name: 'Corn sugar (dextrose)', ingredientType: IngredientType.SUGAR, defaultUnit: 'lb' },
+  { name: 'Turbinado / raw sugar', ingredientType: IngredientType.SUGAR, defaultUnit: 'lb' },
+  // Oak
+  { name: 'American oak cubes (medium toast)', ingredientType: IngredientType.OAK, defaultUnit: 'oz' },
+  { name: 'French oak spirals', ingredientType: IngredientType.OAK, defaultUnit: 'each' },
+  { name: 'Oak chips (light toast)', ingredientType: IngredientType.OAK, defaultUnit: 'oz' },
+  // Stabilizer
+  { name: 'Potassium metabisulfite (Campden)', ingredientType: IngredientType.STABILIZER, defaultUnit: 'tsp' },
+  { name: 'Potassium sorbate', ingredientType: IngredientType.STABILIZER, defaultUnit: 'tsp' },
+  { name: 'Sodium metabisulfite', ingredientType: IngredientType.STABILIZER, defaultUnit: 'tsp' },
+  // Fining
+  { name: 'Bentonite', ingredientType: IngredientType.FINING_AGENT, defaultUnit: 'g' },
+  { name: 'Sparkolloid', ingredientType: IngredientType.FINING_AGENT, defaultUnit: 'tsp' },
+  { name: 'Chitosan / kieselsol fining kit', ingredientType: IngredientType.FINING_AGENT, defaultUnit: 'kit' },
+  // Other
+  { name: 'Pectic enzyme', ingredientType: IngredientType.OTHER, defaultUnit: 'tsp' },
+  { name: 'Irish moss / whirlfloc (beer)', ingredientType: IngredientType.OTHER, defaultUnit: 'tsp' },
+  { name: 'Vitamin C (ascorbic acid, antioxidant)', ingredientType: IngredientType.OTHER, defaultUnit: 'tsp' }
+]
+
+async function ensureGlobalIngredient(row: SeedIngredient) {
+  const existing = await prisma.ingredient.findFirst({
+    where: {
+      userId: null,
+      isGlobal: true,
+      name: row.name
+    }
   })
+  if (existing) return
+
+  await prisma.ingredient.create({
+    data: {
+      userId: null,
+      name: row.name,
+      ingredientType: row.ingredientType,
+      brand: row.brand ?? null,
+      defaultUnit: row.defaultUnit ?? null,
+      notes: row.notes ?? null,
+      isGlobal: true,
+      isArchived: false
+    }
+  })
+}
+
+async function main() {
+  for (const row of GLOBAL_INGREDIENTS) {
+    await ensureGlobalIngredient(row)
+  }
 }
 
 main()

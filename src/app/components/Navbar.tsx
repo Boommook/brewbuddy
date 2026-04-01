@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CirclePlus } from "lucide-react";
-import { getSessionUser } from "../../server/auth-credentials";
+import { getSessionUser } from "@/src/server/auth-credentials";
 import { signOutAction } from "../actions/auth";
 import { LogOut } from "lucide-react";
 import { Button } from "./ui/button";
@@ -33,15 +33,15 @@ export default async function Navbar() {
               </Link>
             </>
           )}
-          <Link href="/createbatch" className="hover:cursor-pointer hover:scale-110 rounded-full hover:bg-black/10">
-            <CirclePlus className="size-10 rounded-full p-1" />
+          <Link href="/createbatch" className="button-style rounded-full">
+            <CirclePlus className="size-10 rounded-full p-1 hover:text-bright-blue-200" />
           </Link>
           {user && <form action={signOutAction}>
                 <Button
                   type="submit"
-                  className="button-style rounded-full flex items-center bg-transparent justify-center p-1 text-antique-white-100 "
+                  className="button-style rounded-full flex items-center bg-transparent justify-center p-1 "
                 >
-                  <LogOut className="size-8" strokeWidth={2} />
+                  <LogOut className="size-8 hover:text-bright-blue-200" strokeWidth={2} />
                 </Button>
               </form>}
         </div>

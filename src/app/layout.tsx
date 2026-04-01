@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import { getUserId } from "../server/auth";
-import { TooltipProvider } from "@/components/ui/tooltip"
+import { TooltipProvider } from "./components/ui/tooltip"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +37,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-camel-300`}
       >
-        {userId && <div className="sticky top-0 z-50 shadow-lg shadow-[#888]">
+        {userId && <div className="sticky top-0 z-50 shadow-lg shadow-black/20">
         <Navbar />
         </div>}
         
