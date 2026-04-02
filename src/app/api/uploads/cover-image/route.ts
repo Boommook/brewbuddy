@@ -4,11 +4,21 @@ import { NextResponse } from "next/server";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
+/*
+  POST: upload a cover image
+  this route is used to upload a cover image to the server
+  the image is stored in the public/img/batches folder
+  the url is the path to the image
+*/
 export async function POST(req: Request) {
+  // try to upload the cover image
   try {
+    // get the form data from the request
     const formData = await req.formData();
+    // get the file from the form data
     const file = formData.get("file");
 
+    // check if the file is a file object
     if (!(file instanceof File)) {
       return NextResponse.json(
         { ok: false, error: "file field is required" },
@@ -16,7 +26,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const arrayBuffer = await file.arrayBuffer();
+    // convert the file to an array buffer
+    const arrayBuffer = await file.arrayBuffer(); // docs: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
     const buffer = Buffer.from(arrayBuffer);
 
     const uploadsDir = path.join(process.cwd(), "public", "img", "batches");

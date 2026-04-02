@@ -44,13 +44,15 @@ export type CreateBatchAdditionPayload = {
   notes?: string | null;
 };
 
+// type for creating a new batch
+// this is the input for creating a new batch on the create batch page
 export type CreateBatchInput = {
+  // required fields
   name: string;
   category: BrewCategory;
-  /** Optional mead subtype; only used when category is MEAD. */
+  // optional fields
   meadSubtype?: string | null;
   thumbnailImageUrl?: string | null;
-  // iso 8601; defaults to current instant server-side if omitted.
   startDate?: string;
   targetVolume?: number | null;
   actualVolume?: number | null;
@@ -62,10 +64,11 @@ export type CreateBatchInput = {
   additions?: CreateBatchAdditionPayload[];
 };
 
+// type for updating a batch
+// this is the input for updating a batch on the dashboard page
 export type UpdateBatchInput = {
   name?: string;
   category?: BrewCategory;
-  /** Optional mead subtype; only used when category is MEAD. */
   meadSubtype?: string | null;
   thumbnailImageUrl?: string | null;
   startDate?: string;
@@ -80,7 +83,7 @@ export type UpdateBatchInput = {
   notes?: string | null;
 };
 
-// shape returned by prisma for the dashboard list query (scalar fields only).
+// type returned by prisma for the dashboard list query (scalar fields only).
 export type DashboardBatchListRow = {
   id: string;
   name: string;

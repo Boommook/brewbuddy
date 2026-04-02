@@ -12,135 +12,7 @@ import {
   FieldLabel,
 } from "@/src/app/components/ui/field"
 
-const BREW_CATEGORIES = [
-  { value: "MEAD", label: "Mead" },
-  { value: "WINE", label: "Wine" },
-  { value: "CIDER", label: "Cider" },
-  { value: "BEER", label: "Beer" },
-  { value: "KOMBUCHA", label: "Kombucha" },
-  { value: "OTHER", label: "Other" },
-] as const;
-
-const MEAD_SUBTYPES = [
-  {
-    value: "ACERGLYN",
-    label: "Acerglyn",
-    description:
-      "Brewed with maple syrup.",
-  },
-  {
-    value: "BRAGGOT",
-    label: "Braggot",
-    description:
-      "Brewed with both honey and grains.",
-  },
-  {
-    value: "BOCHET",
-    label: "Bochet",
-    description:
-      "Brewed with caramelized honey.",
-  },
-  {
-    value: "CAPSICUMEL",
-    label: "Capsicumel",
-    description:
-      "Brewed with spicy peppers.",
-  },
-  {
-    value: "CYSER",
-    label: "Cyser",
-    description: "Brewed with apples or apple juice.",
-  },
-  {
-    value: "SACK_MEAD",
-    label: "Sack Mead (Great Mead)",
-    description:
-      "Brewed with a high honey-to-water ratio.",
-  },
-  {
-    value: "HIPPOCRAS",
-    label: "Hippocras",
-    description:
-      "Brewed with wine, cinnamon, spices, and sugar.",
-  },
-  {
-    value: "HYDROMEL",
-    label: "Hydromel",
-    description:
-      "Brewed with a low-ABV session mead.",
-  },
-  {
-    value: "METHEGLIN",
-    label: "Metheglin",
-    description:
-      "Brewed with spices such as cinnamon, nutmeg, or vanilla beans.",
-  },
-  {
-    value: "MORAT",
-    label: "Morat",
-    description: "Brewed with mulberries.",
-  },
-  {
-    value: "MELOMEL",
-    label: "Melomel",
-    description:
-      'Brewed with fruit, whether fermented with or added after fermentation.',
-  },
-  {
-    value: "MULLED_MEAD",
-    label: "Mulled Mead",
-    description:
-      "Mead that is heated when served.",
-  },
-  {
-    value: "OMPHACOMEL",
-    label: "Omphacomel",
-    description:
-      "Brewed with the juice of unripened grapes to add sourness.",
-  },
-  {
-    value: "OXYMEL",
-    label: "Oxymel",
-    description:
-      "Brewed with vinegar, sometimes used as a base for medicinal purposes.",
-  },
-  {
-    value: "PYMENT",
-    label: "Pyment",
-    description:
-      "Brewed with grapes or blended with wine and mead components.",
-  },
-  {
-    value: "RHODOMEL",
-    label: "Rhodomel",
-    description:
-      "Brewed with rosehips, rose petals, or rose attar.",
-  },
-  {
-    value: "SHORT_MEAD",
-    label: "Short Mead (Hydromel)",
-    description:
-      "Quick-to-make, typically low-ABV mead.",
-  },
-  {
-    value: "SHOW_MEAD",
-    label: "Show Mead / Traditional Mead",
-    description:
-      "Classic mead of honey, water, and yeast — the standard traditional style.",
-  },
-  {
-    value: "SPARKLING_MEAD",
-    label: "Sparkling Mead",
-    description:
-      "Carbonated mead, either bottle-conditioned with added sugar/honey or force-carbonated.",
-  },
-  {
-    value: "SOUR_MEAD",
-    label: "Sour Mead",
-    description:
-      "Mead using wild yeasts and lactic bacteria to achieve a sour profile.",
-  },
-] as const;
+import { BREW_CATEGORIES, MEAD_SUBCATEGORIES, type BrewCategory, type MeadSubcategory } from "@/src/types/batch_types";
 
 const CUSTOM_VALUE = "__custom__";
 
@@ -170,8 +42,10 @@ export default function CreateBatch() {
   const [catalogError, setCatalogError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
-  const [category, setCategory] = useState<string>("MEAD");
-  const [meadSubtype, setMeadSubtype] = useState<string>("");
+  // state for the brew category. this uses the BrewCategory type to ensure the value is valid (to avoid a random string being set)
+  const [category, setCategory] = useState<BrewCategory>("MEAD");
+  // state for the mead subtype. this uses the MeadSubcategory type to ensure the value is valid (to avoid a random string being set)
+  const [meadSubtype, setMeadSubtype] = useState<MeadSubcategory | null>(null);
   const [startDate, setStartDate] = useState(() =>
     new Date().toISOString().slice(0, 10)
   );
@@ -184,32 +58,51 @@ export default function CreateBatch() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
+  // state for the cover image. this is the file object of the cover image (used to send the file to the server)
   const [coverImage, setCoverImage] = useState<File | null>(null);
+  // state for the cover image url. this is the url of the cover image (used to actually display the cover image)
+  // the image is actually stored in the public/img/batches folder and the url is the path to the image
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
 
+  /*
+    function called when the cover image is changed
+    1. it sends the cover image file to the server
+    2. it uses the url from the server to set the cover image url state
+  */
   const handleCoverImageChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = e.target.files?.[0] ?? null;
+    // get the file from the input by getting the first file from the files array
+    const file = e.target.files?.[0] ?? null; // if no file is selected, set the cover image to null
 
+    // check if file is null, if so...
     if (!file) {
+      // set the cover image to null and the cover image url to null and return
       setCoverImage(null);
       setCoverImageUrl(null);
       return;
     }
 
+    //otherwise...
+
+    // set the cover image to the file
     setCoverImage(file);
 
-    const formData = new FormData();
+    // create a new form data object to send the file to the server
+    const formData = new FormData(); // docs: https://developer.mozilla.org/en-US/docs/Web/API/FormData
+    // append the file to the form data
     formData.append("file", file);
 
     try {
+      // send the file to the server
       const res = await fetch("/api/uploads/cover-image", {
         method: "POST",
         body: formData,
       });
 
+      // get the response
       const data = await res.json();
+      // error checking for invalid response
       if (!res.ok || !data?.ok || typeof data.url !== "string") {
         throw new Error(
           typeof data?.error === "string"
@@ -218,6 +111,7 @@ export default function CreateBatch() {
         );
       }
 
+      // if the response is ok, set the cover image url to the url from the response
       setCoverImageUrl(data.url);
     } catch (error) {
       setFormError(
@@ -426,7 +320,7 @@ export default function CreateBatch() {
               <select
                 className="auth-input-style w-full"
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => setCategory(e.target.value as BrewCategory)}
               >
                 {BREW_CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>
@@ -443,11 +337,11 @@ export default function CreateBatch() {
                 </span>
                 <select
                   className="auth-input-style w-full"
-                  value={meadSubtype}
-                  onChange={(e) => setMeadSubtype(e.target.value)}
+                  value={meadSubtype ?? ""}
+                  onChange={(e) => setMeadSubtype(e.target.value as MeadSubcategory)}
                 >
                   <option value="">— Select subtype —</option>
-                  {MEAD_SUBTYPES.map((s) => (
+                  {MEAD_SUBCATEGORIES.map((s) => (
                     <option key={s.value} value={s.value}>
                       {s.label}
                     </option>

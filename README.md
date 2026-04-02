@@ -83,15 +83,14 @@ src/
 | `npm run start` | Run production   |
 | `npm run lint`  | Run ESLint       |
 
-## User constraints (from spec)
+## A Note on Comments
 
-- **Incomplete data** – The app tolerates partial check-up inputs (e.g. gravity only, or notes only).
-- **Irregular schedules** – Users can override the next check date.
-- **Terminology** – UI should stay clear for users unfamiliar with brewing terms (consider tooltips or a small glossary later).
+I tried to comment the majority of files in any "important" places
+Files that I used Cursor to generate are commented as so at the top.
 
 ## A Note on AI
 
-I am a frequent web developer with personal, academic, and professional experience. I use Cursor to maximize my efficiency. I commonly utilize Cursor's autofill feature, as well as automating the programming of repetitive tasks such as writing API endpoints or seeding the database.
+I am a frequent web developer with personal, academic, and professional experience. I use Cursor to maximize my efficiency. I commonly utilize Cursor's autofill feature, as well as automating the programming of repetitive tasks such as writing API endpoints or seeding the database. As noted above, I added comments at the top of files that are Cursor generated.
 
 In future iterations I will go through my repository to optimize and comment any generated code.
 
@@ -106,3 +105,9 @@ In future iterations I will go through my repository to optimize and comment any
 
 - Recipe sharing and scaling to more stakeholders (e.g. competition judges).
 - Optional export of batch history (PDF/CSV).
+
+## User constraints (from spec)
+
+- **Incomplete data** – The app tolerates partial check-up inputs (e.g. gravity only, or notes only).
+- **Irregular schedules** – Users can override the next check date.
+- **Terminology** – UI should stay clear for users unfamiliar with brewing terms (consider tooltips or a small glossary later).

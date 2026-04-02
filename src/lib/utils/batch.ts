@@ -1,6 +1,9 @@
 import type { Batch, Prisma } from '../../generated/prisma/index.js'
 
-// scalar columns on `Batch` (no relations), aligned with `schema.prisma`.
+/*
+  docs: https://www.typescriptlang.org/docs/handbook/utility-types.html
+  Constructs a new type by picking the properties specified from the original type: 'Batch'
+*/
 export type BatchScalarFields = Pick<
   Batch,
   | 'id'
@@ -25,14 +28,21 @@ export type BatchScalarFields = Pick<
   | 'isFavorite'
 >
 
+
+/* 
+  Helper fcns to convert decimal and date values to strings.
+*/
 function decimalToString(value: Prisma.Decimal | null): string | null {
   return value === null ? null : value.toString()
 }
-
 function dateToISO(value: Date | null): string | null {
   return value === null ? null : value.toISOString()
 }
 
+/* 
+  Converts a `Batch` Prisma model instance to a JSON-serializable object.
+  Specifically, the fcn converts decimal and date values to strings
+*/
 export function toBatchDTO(batch: Batch) {
   return {
     id: batch.id,

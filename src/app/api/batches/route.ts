@@ -6,6 +6,10 @@ import {
   deleteBatch,
 } from "../../../server/batches";
 
+/*
+  GET: get all batches for the current user
+*/
+
 export async function GET() {
   try {
     const batches = await getBatchesForDashboard();
@@ -18,8 +22,12 @@ export async function GET() {
   }
 }
 
+/*
+  POST: create a new batch
+*/
 export async function POST(req: Request) {
-  let body: Partial<CreateBatchInput>;
+  // extract body
+  let body: CreateBatchInput;
   try {
     body = await req.json();
   } catch {
@@ -29,6 +37,7 @@ export async function POST(req: Request) {
     );
   }
 
+  // error checking for invalid input of required fields
   if (typeof body.name !== "string" || typeof body.category !== "string") {
     return NextResponse.json(
       { ok: false, error: "name and category are required" },
@@ -36,6 +45,7 @@ export async function POST(req: Request) {
     );
   }
 
+  // create new batch
   try {
     const created = await createNewBatch({
       name: body.name,
@@ -53,8 +63,10 @@ export async function POST(req: Request) {
       additions: Array.isArray(body.additions) ? body.additions : undefined,
     } as CreateBatchInput);
 
+    // return created batch
     return NextResponse.json({ ok: true, batch: created });
   } catch (e) {
+    // error handling
     const message = e instanceof Error ? e.message : "Failed to create batch";
     const status =
       message === "User not found" || message === "Unauthorized" ? 401 : 400;
@@ -65,6 +77,9 @@ export async function POST(req: Request) {
   }
 }
 
+/*
+  DELETE: delete a batch
+*/
 export async function DELETE(req: Request) {
   const { id } = await req.json();
   try {

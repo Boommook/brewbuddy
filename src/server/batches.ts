@@ -11,37 +11,52 @@ import {
 import type { CreateBatchAdditionPayload, CreateBatchInput } from "../types/batch";
 import { toBatchDTO } from "../lib/utils/batch";
 
+/*
+  return all active batches of the current user
+*/
 export async function getBatchesForDashboard() {
   const userId = await getUserId();
   if (!userId) throw new Error("User not found");
 
   const batches = await prisma.batch.findMany({
     where: {
+      // select only batches for the current user
       userId,
+      // select only active batches
       status: BatchStatus.ACTIVE,
     },
+    // order by creation date descending
     orderBy: { createdAt: "desc" },
   });
 
   return batches.map((b) => toBatchDTO(b));
 }
 
+/*
+  delete a batch
+*/
 export async function deleteBatch(batchId: string){
   const userId = await getUserId();
   if(!userId) throw new Error("User not found");
 
+  // delete the batch
   const deletedBatch = await prisma.batch.delete({
+    // delete only the batch for the current user
     where: {
       id: batchId,
       userId
     }
   });
 
+  // error checking for batch not found
   if(!deletedBatch) throw new Error("Batch not found");
 
   return deletedBatch;
 }
 
+/*
+  get a summary of a batch for the current user
+*/
 export async function getBatchSummaryForUser(batchId: string) {
   const userId = await getUserId();
   if (!userId) return null;
@@ -52,17 +67,26 @@ export async function getBatchSummaryForUser(batchId: string) {
   });
 }
 
+
 type BatchPatch = {
   isFavorite?: boolean;
   thumbnailImageUrl?: string | null;
 };
 
+/*
+  update a batch
+  `patch` is an object with the fields to update.
+  right now, only `isFavorite` and `thumbnailImageUrl` are supported.
+*/
 export async function updateBatch(batchId: string, patch: BatchPatch) {
   const userId = await getUserId();
   if (!userId) throw new Error("User not found");
 
+  // build the data object to update
   const data: { isFavorite?: boolean; thumbnailImageUrl?: string | null } = {};
+  // update the isFavorite field if it is provided
   if (patch.isFavorite !== undefined) data.isFavorite = patch.isFavorite;
+  // update the thumbnailImageUrl field if it is provided
   if (patch.thumbnailImageUrl !== undefined)
     data.thumbnailImageUrl = patch.thumbnailImageUrl;
 
@@ -70,11 +94,13 @@ export async function updateBatch(batchId: string, patch: BatchPatch) {
     throw new Error("No fields to update");
   }
 
+  // update the batch given the data object constructed above
   const updated = await prisma.batch.updateMany({
     where: { id: batchId, userId },
     data,
   });
 
+  // error checking for batch not found
   if (updated.count === 0) {
     const exists = await prisma.batch.findFirst({
       where: { id: batchId },
@@ -84,6 +110,7 @@ export async function updateBatch(batchId: string, patch: BatchPatch) {
     throw new Error("Unauthorized");
   }
 
+  // return the updated batch as a DTO
   const batch = await prisma.batch.findFirstOrThrow({
     where: { id: batchId, userId },
   });

@@ -8,5 +8,5 @@ export function getNextCheckDue(lastCheckDate: string, intervalDays: number): st
   return date.toISOString().split("T")[0]!;
 }
 
-// default check interval in days (e.g. weekly = 7).
+// default check interval in days. I check my batches weekly, so this is 7
 export const DEFAULT_CHECK_INTERVAL_DAYS = 7;
