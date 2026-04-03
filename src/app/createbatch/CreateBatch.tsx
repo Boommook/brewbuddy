@@ -38,6 +38,7 @@ function newRow(): AdditionRow {
 
 export default function CreateBatch() {
   const router = useRouter();
+  // state for the ingredients. this is an array of ingredient DTOs
   const [ingredients, setIngredients] = useState<IngredientDTO[]>([]);
   const [catalogError, setCatalogError] = useState<string | null>(null);
 
@@ -113,7 +114,9 @@ export default function CreateBatch() {
 
       // if the response is ok, set the cover image url to the url from the response
       setCoverImageUrl(data.url);
-    } catch (error) {
+    } 
+    // if an error occurs, set the form error and set the cover image and cover image url to null
+    catch (error) {
       setFormError(
         error instanceof Error
           ? error.message
@@ -124,16 +127,29 @@ export default function CreateBatch() {
     }
   };
 
+  /*
+  useEffect hook to load the ingredient catalog when the component mounts (on page load)
+  1. it fetches the ingredient catalog from the server
+  2. it sets the ingredients state to the ingredient catalog
+  3. if an error occurs, it sets the catalog error state to the error message
+  */
   useEffect(() => {
+    // create a cancelled variable to track if the effect has been cancelled
     let cancelled = false;
+    // async function to fetch the ingredients
     (async () => {
       try {
+        // fetch the ingredients
         const res = await fetch("/api/ingredients");
+        // ensure the response is ok
         if (!res.ok) {
           throw new Error("Could not load ingredient catalog");
         }
+        // get the data from the response
         const data = await res.json();
+        // ensure the data is ok and is an array
         if (!cancelled && data.ok && Array.isArray(data.ingredients)) {
+          // set the ingredients state to the ingredient catalog
           setIngredients(data.ingredients);
         }
       } catch (e) {
@@ -149,6 +165,10 @@ export default function CreateBatch() {
     };
   }, []);
 
+  /*
+  function called when an ingredient is selected from the catalog
+  
+  */
   const onSelectIngredient = useCallback((rowId: string, value: string) => {
     setRows((prev) =>
       prev.map((r) => {
@@ -179,14 +199,18 @@ export default function CreateBatch() {
   const removeRow = (id: string) =>
     setRows((r) => r.filter((x) => x.id !== id));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
+    // prevent the default form submission behavior
     e.preventDefault();
+    // clear the form error
     setFormError(null);
+    // ensure the batch name is not empty
     if (!name.trim()) {
       setFormError("Give your batch a name.");
       return;
     }
 
+    // create an array to store the additions
     const additions: {
       ingredientId: string | null;
       customIngredientName: string | null;
@@ -469,11 +493,7 @@ export default function CreateBatch() {
                           </span>
                           <select
                             className="auth-input-style w-full text-sm"
-                            value={
-                              row.selectValue === CUSTOM_VALUE
-                                ? CUSTOM_VALUE
-                                : row.selectValue
-                            }
+                            value={row.selectValue}
                             onChange={(e) =>
                               onSelectIngredient(row.id, e.target.value)
                             }
@@ -612,7 +632,7 @@ export default function CreateBatch() {
               variant="outline"
               onClick={() => router.push("/")}
               disabled={submitting}
-              className="shadow-style bg-cayenne-red hover:bg-cayenne-red-700 button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-800 text-golden-orange-100 hover:text-golden-orange-200"
+              className="cancel-button button-style shadow-style"
             >
               Cancel
             </Button>

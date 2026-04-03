@@ -33,17 +33,24 @@ function toIngredientDTO(row: {
   };
 }
 
+/*
+  return all ingredients (global and user-specific) for the current user
+*/
 export async function getIngredientsForUserCatalog(): Promise<IngredientDTO[]> {
+  // get the current user id from the session
   const userId = await getUserId();
-  if (!userId) throw new Error("User not found");
+  if (!userId) throw new Error("User not found"); // ensure a user is logged in
 
+  // get all rows where the ingredient is not archived and either is global or belongs to the user
   const rows = await prisma.ingredient.findMany({
     where: {
       isArchived: false,
       OR: [{ isGlobal: true }, { userId }],
     },
+    // order the ingredients by type and name
     orderBy: [{ ingredientType: "asc" }, { name: "asc" }],
   });
 
+  // map the rows to ingredient DTOs
   return rows.map(toIngredientDTO);
 }

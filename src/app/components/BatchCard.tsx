@@ -200,6 +200,7 @@ export default function BatchCard({
             {lastCheckedAt.toLocaleDateString()}
           </p>
         </div>
+        <div className="flex flex-col gap-4">
         <Button
           type="button"
           variant="outline"
@@ -210,8 +211,22 @@ export default function BatchCard({
             router.push(`/batches/${id}/log`);
           }}
         >
-          <p>Add Log</p>
+          <p className="text-style">Add Log</p>
         </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className=" bg-cayenne-red-600 hover:bg-cayenne-red-700 border-2 hover:border-cayenne-red-800 border-cayenne-red-700 text-golden-orange-200 hover:text-gray-230 rounded-lg text-lg px-4 py-3
+            shadow-style button-style"
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push(`/batches/${id}`);
+          }}
+        >
+          <p className="text-style">View Batch</p>
+        </Button>
+        </div>
+        
       </div>
     </div>
   );
