@@ -10,6 +10,7 @@ import {
 } from "../generated/prisma/index.js";
 import type { CreateBatchAdditionPayload, CreateBatchInput } from "../types/batch";
 import { toBatchDTO } from "../lib/utils/batch";
+import { calculateABVNumber } from "../lib/utils/helpers";
 
 /*
   return all active batches of the current user
@@ -30,6 +31,15 @@ export async function getBatchesForDashboard() {
   });
 
   return batches.map((b) => toBatchDTO(b));
+}
+
+export async function getBatchById(batchId: string){
+  const userId = await getUserId();
+  if (!userId) return null;
+
+  return prisma.batch.findFirst({
+    where: { id: batchId, userId },
+  });
 }
 
 /*
@@ -67,6 +77,100 @@ export async function getBatchSummaryForUser(batchId: string) {
   });
 }
 
+export async function getBatchABVTimeline(batchId: string){
+  const userId = await getUserId();
+  if (!userId) return null;
+
+  // find the batch
+  const batch = await prisma.batch.findFirst({
+    where: { id: batchId, userId },
+  });
+  if (!batch) return null;
+  // get the OG reading from the batch
+  const oG = batch.originalGravity;
+  if (!oG) {
+    return {
+      name: batch.name,
+      originalGravity: null,
+      rows: [] as {
+        id: string;
+        measuredAt: Date;
+        specificGravity: number;
+        abv: number;
+      }[],
+    };
+  }
+
+  const readings = await prisma.batchMeasurement.findMany({
+    where: { batchId, measurementType: "SPECIFIC_GRAVITY" },
+    select: { id: true, measuredAt: true, value: true },
+    orderBy: { measuredAt: "asc" },
+  });
+
+  const rows = [];
+
+  for (const reading of readings) {
+    const sg = Number(reading.value.toString());
+    const abv = calculateABVNumber(oG.toNumber(), sg);
+    rows.push({
+      id: reading.id,
+      measuredAt: reading.measuredAt,
+      specificGravity: sg,
+      abv: abv,
+    });
+  }
+
+  return {
+    name: batch.name,
+    originalGravity: oG.toNumber(),
+    rows,
+  };
+}
+
+/**
+ * Batch detail for the batch page: relations plus ABV chart rows (empty if no original gravity).
+ */
+export async function getBatchPageData(batchId: string) {
+  const userId = await getUserId();
+  if (!userId) return null;
+
+  const batch = await prisma.batch.findFirst({
+    where: { id: batchId, userId },
+    include: {
+      additions: {
+        include: { ingredient: true },
+        orderBy: [{ addedAt: "asc" }, { createdAt: "asc" }],
+      },
+      events: {
+        orderBy: { occurredAt: "asc" },
+      },
+    },
+  });
+  if (!batch) return null;
+
+  const oG = batch.originalGravity;
+  let abvRows: { id: string; measuredAt: Date; specificGravity: number; abv: number }[] =
+    [];
+
+  if (oG) {
+    const readings = await prisma.batchMeasurement.findMany({
+      where: { batchId, measurementType: "SPECIFIC_GRAVITY" },
+      select: { id: true, measuredAt: true, value: true },
+      orderBy: { measuredAt: "asc" },
+    });
+    for (const reading of readings) {
+      const sg = Number(reading.value.toString());
+      abvRows.push({
+        id: reading.id,
+        measuredAt: reading.measuredAt,
+        specificGravity: sg,
+        abv: calculateABVNumber(oG.toNumber(), sg),
+      });
+    }
+  }
+
+  return { batch, abvRows };
+}
 
 type BatchPatch = {
   isFavorite?: boolean;
@@ -261,3 +365,10 @@ export function normalizeAdditions(
   return out;
 }
 
+export async function getBatchOriginalGravityReading(batchId: string) {
+  const reading = await prisma.batchMeasurement.findFirst({
+    where: { batchId, measurementType: "SPECIFIC_GRAVITY" },
+  });
+  if (!reading) throw new Error("Original gravity reading not found");
+  return reading.value;
+}

@@ -1,7 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { getUserId } from "@/src/server/auth";
 import { getBatchSummaryForUser } from "@/src/server/batches";
-import LogBatchActivity from "./LogBatchActivity";
+import LogBatchActivity from "../../../components/LogBatchActivity";
 
 export default async function BatchLogPage({
   params,

@@ -96,6 +96,8 @@ In future iterations I will go through my repository to optimize and comment any
 
 ## Incomplete
 
+- Ingredient additions later in fermentation
+- Filter ingredients based on event
 - Logging event specifics
 - Display of a batch's history with logging events, ingredient modifications, and additive modificaitons.
 - Email notifications

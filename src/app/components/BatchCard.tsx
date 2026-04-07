@@ -192,7 +192,7 @@ export default function BatchCard({
           <div className="flex gap-2">
             <p>OG: {OG}</p>
             <p>|</p>
-            <p>FG: {FG}</p>
+            <p>SG: {FG}</p>
           </div>
 
           <p className="text-xs">

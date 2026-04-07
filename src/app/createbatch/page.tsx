@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { getUserId } from "@/src/server/auth"
-import CreateBatch from "./CreateBatch"
+import CreateBatch from "../components/CreateBatch"
 
 export default async function CreateBatchPage() {
   const userId = await getUserId()

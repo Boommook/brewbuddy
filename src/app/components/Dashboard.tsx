@@ -1,14 +1,8 @@
 import { getBatchesForDashboard } from "@/src/server/batches";
 import BatchCard from "./BatchCard";
+import { calculateABV } from "@/src/lib/utils/helpers";
 
 const FALLBACK_BATCH_IMAGE = "/img/default.jpg";
-
-function calculateABV(oG: string | null, fG: string | null): number {
-  if (oG === null || oG === "" || fG === null || fG === "") return 0;
-  const og = Number(oG);
-  const fg = Number(fG);
-  return (fg - og) * 131.25 ;
-}
 
 function formatMeadSubtype(subtype: string | null): string | null {
   if (!subtype) return null;

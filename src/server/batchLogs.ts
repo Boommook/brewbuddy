@@ -7,7 +7,7 @@ import { normalizeAdditions } from "./batches";
 import {
   BatchStage,
   EventType,
-  type MeasurementType,
+  MeasurementType,
 } from "../generated/prisma/index.js";
 
 async function requireOwnedBatch(batchId: string, userId: string) {
@@ -57,6 +57,32 @@ export async function createBatchMeasurementLog(input: {
       where: { id: input.batchId },
       data: { updatedAt: new Date() },
     });
+
+    if (input.measurementType === MeasurementType.SPECIFIC_GRAVITY) {
+      const batch = await tx.batch.findUnique({
+        where: { id: input.batchId },
+      });
+      if (batch?.originalGravity == null) {
+        await tx.batch.update({
+          where: { id: input.batchId },
+          data: { 
+            originalGravity: input.value,
+            finalGravity: input.value,
+            updatedAt: new Date(),
+          },
+        });
+      }
+      else{
+        await tx.batch.update({
+          where: { id: input.batchId },
+          data: { 
+            finalGravity: input.value,
+            updatedAt: new Date(),
+          },
+        });
+      }
+    }
+
     return m;
   });
 
@@ -153,4 +179,25 @@ export async function createBatchEventLog(input: {
   });
 
   return event;
+}
+
+export async function getBatchEvents(batchId: string) {
+  return prisma.batchEvent.findMany({
+    where: { batchId },
+    orderBy: { occurredAt: "desc" },
+  });
+}
+
+export async function getBatchMeasurements(batchId: string) {
+  return prisma.batchMeasurement.findMany({
+    where: { batchId },
+    orderBy: { measuredAt: "desc" },
+  });
+}
+
+export async function getBatchGravityReadings(batchId: string) {
+  return prisma.batchMeasurement.findMany({
+    where: { batchId, measurementType: "SPECIFIC_GRAVITY" },
+    orderBy: { measuredAt: "desc" },
+  });
 }
