@@ -54,10 +54,10 @@ export default function BatchCard({
     urgency > 0
       ? urgency > 3
         ? urgency > 5
-          ? "bg-green-700/50"
-          : "bg-yellow-600/50"
-        : "bg-orange-600/50"
-      : "bg-red-600/50";
+          ? "bg-green-700/60"
+          : "bg-yellow-600/60"
+        : "bg-orange-600/60"
+      : "bg-red-600/60";
 
   const handleFavorite = () => {
     const next = !isFavorite;
@@ -123,12 +123,12 @@ export default function BatchCard({
             <div className="flex items-center gap-4">
               <Button
                 variant="outline"
-                className="bg-transparent border-none text-gray-200 hover:text-gray-230 rounded-full
+                className="bg-transparent border-none text-gray-200 hover:text-golden-orange-200 rounded-full
                  button-style hover:bg-transparent hover:border-none p-0"
                 onClick={handleFavorite}
               >
                 <Star
-                  className={`size-6 text-white ${isFavorite ? "fill-yellow-500" : ""}`}
+                  className={`size-6  ${isFavorite ? "fill-yellow-500" : ""}`}
                 />
               </Button>
 
@@ -156,7 +156,7 @@ export default function BatchCard({
       </Tooltip>
 
       <div
-        className="relative overflow-hidden flex flex-col items-center justify-center border-l-2 border-r-2 border-antique-white-600 
+        className="relative overflow-hidden flex flex-col items-center justify-center border-l-2 border-r-2 border-golden-orange-700 
         before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-4 before:bg-linear-to-b before:from-black/30 before:to-transparent after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-4 after:bg-linear-to-t after:from-black/30 after:to-transparent"
         onClick={() => router.push(`/batches/${id}/log`)}
       >
@@ -186,7 +186,7 @@ export default function BatchCard({
       </div>
 
       <div className="flex flex-row bg-camel/75 backdrop-blur-sm border-2 gap-8 nunito-sans-regular justify-between
-       border-antique-white-600 p-4 rounded-b-xl text-harvest-orange-900 items-end">
+       border-golden-orange-700 p-4 rounded-b-xl text-harvest-orange-900 items-end hover:cursor-default">
         <div className="flex flex-col gap-1">
           <h3 className="text-lg font-bold">ABV: {abv}%</h3>
           <div className="flex gap-2">

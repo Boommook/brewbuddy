@@ -612,7 +612,7 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
             variant="outline"
             onClick={() => router.push("/")}
             disabled={submitting}
-            className="shadow-style bg-cayenne-red hover:bg-cayenne-red-700 button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-800 text-golden-orange-100 hover:text-golden-orange-100"
+            className="cancel-button button-style shadow-style"
           >
             Cancel
           </Button>

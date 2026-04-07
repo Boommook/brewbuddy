@@ -326,7 +326,7 @@ p div {
 }
 
 .cancel-button {
-  @apply bg-cayenne-red-600 hover:bg-cayenne-red-700 border-2 border-cayenne-red-700 hover:border-cayenne-red-800 text-golden-orange-100 hover:text-golden-orange-200;
+  @apply bg-cayenne-red-600 hover:bg-cayenne-red-700 border-2 border-cayenne-red-700 hover:border-cayenne-red-800 text-golden-orange-200 hover:text-golden-orange-300;
 }
 
 select {
@@ -336,7 +336,7 @@ select {
 .honeycomb-bg {
   --s: 18px; /* control the size*/
   --c1: #c4b8a1;
-  --c2:rgb(187, 165, 129);
+  --c2:rgba(187, 165, 129, 0.5);
   
   --c:#0000,var(--c1) .5deg 119.5deg,#0000 120deg;
   --g1:conic-gradient(from  60deg at 56.25% calc(425%/6),var(--c));
