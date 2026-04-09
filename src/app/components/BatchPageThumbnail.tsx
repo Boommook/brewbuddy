@@ -11,9 +11,19 @@ type Props = {
   batchId: string;
   imageUrl: string | null;
   alt: string;
+  showLabel?: boolean;
+  styles?: string;
+  insetShadow?: boolean;
 };
 
-export default function BatchPageThumbnail({ batchId, imageUrl, alt }: Props) {
+export default function BatchPageThumbnail({
+  batchId,
+  imageUrl,
+  alt,
+  showLabel = true,
+  styles = "",
+  insetShadow = false,
+}: Props) {
   const router = useRouter();
   const [showImageEdit, setShowImageEdit] = useState(false);
   const [thumbnailSrc, setThumbnailSrc] = useState(
@@ -25,19 +35,23 @@ export default function BatchPageThumbnail({ batchId, imageUrl, alt }: Props) {
   }, [batchId, imageUrl]);
 
   return (
-    <div className="flex flex-col rounded-xl border-2 border-golden-orange-700 shadow-style">
-      <div className="relative">
+    <div className={styles || undefined}>
+      <div
+        className={`relative overflow-hidden ${insetShadow ? " image-inset-shadow h-full w-full min-h-0" : ""}`}
+      >
         <Image
           src={thumbnailSrc}
           alt={alt}
           width={1000}
           height={1000}
-          className="rounded-t-xl"
+          className={
+            `${styles.includes("rounded-t-xl") ? "rounded-t-xl" : ""} ${insetShadow ? "h-full w-full object-cover" : ""}`
+          }
         />
         <Button
           type="button"
           size="icon"
-          className="absolute top-2 right-2 size-10 rounded-full button-style bg-bright-blue hover:bg-bright-blue-700 text-antique-white"
+          className="absolute top-2 right-2 shadow-style border-none size-10 rounded-full button-style bg-bright-blue hover:bg-bright-blue-700 text-antique-white"
           aria-label="Edit batch image"
           onClick={() => setShowImageEdit(true)}
         >
@@ -52,9 +66,11 @@ export default function BatchPageThumbnail({ batchId, imageUrl, alt }: Props) {
           />
         ) : null}
       </div>
-      <p className="rounded-b-xl border-t-2 border-golden-orange-700 bg-golden-orange-100/60 px-3 py-2 text-md font-semibold">
-        Thumbnail
-      </p>
+      {showLabel ? (
+        <p className="rounded-b-lg border-t-2 table-label px-4 py-1 text-md font-semibold">
+          Thumbnail
+        </p>
+      ) : null}
     </div>
   );
 }

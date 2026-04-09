@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from "./ui/popover"
 import ImageEdit from "./ImageEdit";
+import BatchPageThumbnail from "./BatchPageThumbnail";
 
 export default function BatchCard({
   id,
@@ -88,7 +89,7 @@ export default function BatchCard({
   };
 
   return (
-    <div className="hover:cursor-pointer w-[30vw] shadow-style rounded-xl">
+    <div className="hover:cursor-pointer w-[30vw] shadow-lg shadow-black/30 rounded-xl">
       <Tooltip>
         <TooltipTrigger
           className="block w-full cursor-default text-left"
@@ -156,33 +157,17 @@ export default function BatchCard({
       </Tooltip>
 
       <div
-        className="relative overflow-hidden flex flex-col items-center justify-center border-l-2 border-r-2 border-golden-orange-700 
-        before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-4 before:bg-linear-to-b before:from-black/30 before:to-transparent after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-4 after:bg-linear-to-t after:from-black/30 after:to-transparent"
+        className="relative overflow-hidden flex flex-col items-center justify-center border-l-2 border-r-2 border-golden-orange-700 "
         onClick={() => router.push(`/batches/${id}/log`)}
       >
-        <Image
-          src={thumbnailImageUrl}
+        <BatchPageThumbnail
+          batchId={id}
+          imageUrl={thumbnailImageUrl}
           alt={title}
-          // just use a large value as placeholder
-          width={1000}
-          height={1000}
-          // specify the actual size (h of 64 and w fills width)
-          className="h-64 w-full object-cover"
+          showLabel={false}
+          styles="h-64 w-full"
+          insetShadow
         />
-        <Button
-          type="button"
-          size="icon"
-          variant="secondary"
-          className="absolute top-2 right-2 size-9 rounded-full button-style bg-bright-blue hover:bg-bright-blue-700 text-antique-white"
-          aria-label="Edit cover image"
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowImageEdit(true);
-          }}
-        >
-          <SquarePen className="size-4" aria-hidden />
-        </Button>
-        {showImageEdit && <ImageEdit batchId={id} setThumbnailImageUrl={setThumbnailImageUrl} setShowImageEdit={setShowImageEdit} />}
       </div>
 
       <div className="flex flex-row bg-camel/75 backdrop-blur-sm border-2 gap-8 nunito-sans-regular justify-between

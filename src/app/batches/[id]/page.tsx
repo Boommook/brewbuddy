@@ -9,6 +9,7 @@ import {
 } from "@/src/types/batch_types";
 import { calculateABV } from "@/src/lib/utils/helpers";
 import type { IngredientType, EventType, MeadSubtype } from "@/src/generated/prisma/index.js";
+import BackButton from "../../components/BackButton";
 
 function formatCategoryLabel(category: BrewCategory): string {
   return BREW_CATEGORIES.find((c) => c.value === category)?.label ?? category;
@@ -66,19 +67,23 @@ function currentAbvDisplay(args: {
   originalGravity: { toString(): string } | null | undefined;
   finalGravity: { toString(): string } | null | undefined;
 }): string {
+  // first check if the calculated ABV is available, if so, use it
   if (args.calculatedABV != null) {
     const n = Number(args.calculatedABV.toString());
     if (Number.isFinite(n)) return `${n.toFixed(2)}%`;
   }
+  // if not, check if there are any ABV rows, if so, use the latest
   if (args.abvRows.length > 0) {
     const n = args.abvRows[args.abvRows.length - 1]!.abv;
     return `${n.toFixed(2)}%`;
   }
+  // if not, calculate the ABV from the original and final gravities, if it's greater than 0, use it
   const fromGravities = calculateABV(
     args.originalGravity?.toString() ?? null,
     args.finalGravity?.toString() ?? null,
   );
   if (fromGravities > 0) return `${fromGravities.toFixed(2)}%`;
+  // otherwise, something is wrong, so return a placeholder
   return "—";
 }
 
@@ -94,14 +99,18 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="my-8 flex h-full w-[90vw] flex-col gap-4 rounded-xl border-2 border-golden-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs mx-auto">
-      <h1 className="text-2xl font-bold">{name}</h1>
+      <div className="flex flex-row items-center w-full">
+        <BackButton/>
+        <h1 className="text-2xl font-bold flex flex-col items-center justify-center text-harvest-orange-900 mx-auto">{name} <hr className="border-cayenne-red-700 border-2 w-full" /></h1>
+
+      </div>
       <div className="flex flex-row gap-8">
       <div className="flex w-[30%] shrink-0 flex-col gap-4">
-        <div className="flex flex-col shadow-style w-full shrink-0 rounded-lg border-2 border-golden-orange-700 bg-antique-white-100/80 text-sm">
-          <h2 className="text-header rounded-t-lg border-b-2 border-harvest-orange-600 bg-golden-orange-100/60 px-3 py-2 text-lg font-semibold">
+        <div className="flex flex-col shadow-style w-full shrink-0 rounded-lg border-2 border-harvest-orange-700 text-sm">
+          <h2 className="text-header rounded-t-md table-label px-4 py-1 text-lg font-semibold">
               Batch Details
           </h2>
-          <dl className="grid w-full shrink-0 grid-cols-[auto_1fr] gap-x-4 gap-y-2 px-4 py-2 pb-4">
+          <dl className="grid w-full shrink-0 grid-cols-[auto_1fr] gap-x-4 gap-y-2 px-4 py-2 pb-4 bg-antique-white-100 rounded-b-lg">
             <dt className="font-semibold text-foreground">Category</dt>
             <dd className="nunito-sans-regular">{formatCategoryLabel(batch.category as BrewCategory)}</dd>
 
@@ -138,6 +147,7 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
           batchId={batch.id}
           imageUrl={batch.thumbnailImageUrl}
           alt={name}
+          styles="flex flex-col rounded-t-xl border-2 border-golden-orange-700 shadow-style"
         />
         
         <ABVChart ABVData={abvRows.map((row) => ({ measuredAt: row.measuredAt, abv: row.abv }))} />
@@ -146,12 +156,12 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
       <div className="flex min-w-0 flex-1 flex-col gap-6">
         <div className="flex flex-row gap-4 lg:items-start lg:gap-8">
           
-        
+              
           <div className="min-w-0 flex-1 table-wrap shadow-style">
-            <h2 className="border-b-2 text-header border-harvest-orange-600 bg-golden-orange-100/60 px-3 py-2 text-lg font-semibold">
+            <h2 className="table-label px-4 py-1 text-lg font-semibold">
               Ingredients added
             </h2>
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse bg-antique-white-100">
               <thead>
                 <tr className="text-header">
                   <th className="thcell">Name</th>
@@ -194,11 +204,11 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
         </div>
           
 
-        <div className="min-h-0 flex-1 table-wrap shadow-style">
-          <h2 className="border-b-2 border-harvest-orange-600 bg-golden-orange-100/60 px-3 py-2 text-lg font-semibold">
+        <div className="min-h-0 table-wrap shadow-style h-fit">
+          <h2 className="table-label px-4 py-1 text-lg font-semibold">
             Events
           </h2>
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse bg-antique-white-100 h-fit">
             <thead>
               <tr>
                 <th className={"thcell"}>When</th>
@@ -207,7 +217,7 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
                 <th className={"thcell"}>Description</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="h-full">
               {batch.events.length === 0 ? (
                 <tr>
                   <td className={"tdcell"} colSpan={4}>
@@ -224,6 +234,7 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
                   </tr>
                 ))
               )}
+              
             </tbody>
           </table>
         </div>
