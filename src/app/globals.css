@@ -302,6 +302,14 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.text-header {
+  @apply text-harvest-orange-900;
+}
+
+.text-foreground {
+  @apply text-cayenne-red-900;
+}
+
 .button-style {
   @apply hover:scale-105 hover:cursor-pointer;
 }
@@ -319,8 +327,23 @@ body {
   @apply bg-cayenne-red-600 hover:bg-cayenne-red-700 border-2 border-cayenne-red-700 hover:border-cayenne-red-800 text-golden-orange-200 hover:text-golden-orange-300;
 }
 
+.table-wrap {
+  @apply overflow-x-auto rounded-lg border-2 border-harvest-orange-600 bg-antique-white-100/80;
+}
+
+.thcell {
+  @apply border-b-2 border-harvest-orange-600 bg-golden-orange-100/50 px-3 py-2 text-left text-sm font-semibold;
+}
+.tdcell {
+  @apply border-b border-harvest-orange-600/40 px-3 py-2 text-sm;
+}
+
 select {
   @apply hover:cursor-pointer;
+}
+
+tbody {
+  @apply text-cayenne-red-900;
 }
 
 .honeycomb-bg {

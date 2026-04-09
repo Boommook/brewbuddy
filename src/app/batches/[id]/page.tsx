@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import { getBatchPageData } from "@/src/server/batches";
 import { ABVChart } from "../../components/ABVChart";
+import BatchPageThumbnail from "../../components/BatchPageThumbnail";
 import {
   BREW_CATEGORIES,
   MEAD_SUBCATEGORIES,
@@ -82,12 +82,6 @@ function currentAbvDisplay(args: {
   return "—";
 }
 
-const tableWrap =
-  "overflow-x-auto rounded-lg border-2 border-golden-orange-700 bg-antique-white-100/80";
-const thCell =
-  "border-b-2 border-golden-orange-700 bg-golden-orange-100/50 px-3 py-2 text-left text-sm font-semibold";
-const tdCell = "border-b border-golden-orange-700/40 px-3 py-2 text-sm nunito-sans-regular";
-
 export default async function BatchPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const pageData = await getBatchPageData(id);
@@ -97,45 +91,81 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
 
   const { batch, abvRows } = pageData;
   const name = batch.name;
-  const thumbnailImageUrl = batch.thumbnailImageUrl;
 
   return (
     <div className="my-8 flex h-full w-[90vw] flex-col gap-4 rounded-xl border-2 border-golden-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs mx-auto">
       <h1 className="text-2xl font-bold">{name}</h1>
       <div className="flex flex-row gap-8">
       <div className="flex w-[30%] shrink-0 flex-col gap-4">
-        <div className="flex flex-col rounded-xl border-2 border-golden-orange-700">
-          <Image
-            src={thumbnailImageUrl ?? "/img/default.jpg"}
-            alt={name}
-            width={1000}
-            height={1000}
-            className="rounded-t-xl"
-          />
-          <p className="rounded-b-xl bg-golden-orange-100/60 px-3 border-t-2 border-golden-orange-700 py-2 text-md font-semibold">Thumbnail</p>
+        <div className="flex flex-col shadow-style w-full shrink-0 rounded-lg border-2 border-golden-orange-700 bg-antique-white-100/80 text-sm">
+          <h2 className="text-header rounded-t-lg border-b-2 border-harvest-orange-600 bg-golden-orange-100/60 px-3 py-2 text-lg font-semibold">
+              Batch Details
+          </h2>
+          <dl className="grid w-full shrink-0 grid-cols-[auto_1fr] gap-x-4 gap-y-2 px-4 py-2 pb-4">
+            <dt className="font-semibold text-foreground">Category</dt>
+            <dd className="nunito-sans-regular">{formatCategoryLabel(batch.category as BrewCategory)}</dd>
+
+            {batch.meadSubtype ? (
+              <>
+                <dt className="font-semibold text-foreground">Subcategory</dt>
+                <dd className="nunito-sans-regular">
+                  {formatMeadSubtypeLabel(batch.meadSubtype) ?? formatEnumLabel(batch.meadSubtype)}
+                </dd>
+              </>
+            ) : null}
+
+            <dt className="font-semibold text-foreground">Current ABV</dt>
+            <dd className="nunito-sans-regular">
+              {currentAbvDisplay({
+                calculatedABV: batch.calculatedABV,
+                abvRows,
+                originalGravity: batch.originalGravity,
+                finalGravity: batch.finalGravity,
+              })}
+            </dd>
+
+            <dt className="font-semibold text-foreground">Date started</dt>
+            <dd className="nunito-sans-regular">{formatDate(batch.startDate)}</dd>
+
+            <dt className="font-semibold text-foreground">Original gravity</dt>
+            <dd className="nunito-sans-regular">{formatGravity(batch.originalGravity)}</dd>
+
+            <dt className="font-semibold text-foreground">Current specific gravity</dt>
+            <dd className="nunito-sans-regular">{formatGravity(batch.finalGravity)}</dd>
+          </dl>
         </div>
+        <BatchPageThumbnail
+          batchId={batch.id}
+          imageUrl={batch.thumbnailImageUrl}
+          alt={name}
+        />
         
         <ABVChart ABVData={abvRows.map((row) => ({ measuredAt: row.measuredAt, abv: row.abv }))} />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-8">
-          <div className={`min-w-0 flex-1 ${tableWrap}`}>
-            <h2 className="border-b-2 border-golden-orange-700 bg-golden-orange-100/60 px-3 py-2 text-lg font-semibold">
+        <div className="flex flex-row gap-4 lg:items-start lg:gap-8">
+          
+        
+          <div className="min-w-0 flex-1 table-wrap shadow-style">
+            <h2 className="border-b-2 text-header border-harvest-orange-600 bg-golden-orange-100/60 px-3 py-2 text-lg font-semibold">
               Ingredients added
             </h2>
             <table className="w-full border-collapse">
               <thead>
-                <tr>
-                  <th className={thCell}>Name</th>
-                  <th className={thCell}>Type</th>
-                  <th className={thCell}>Date added</th>
+                <tr className="text-header">
+                  <th className="thcell">Name</th>
+                  <th className="thcell">Type</th>
+                  <th className={"thcell"}>Date added</th>
+                  <th className={"thcell"}>Amount</th>
+                  <th className={"thcell"}>Unit</th>
+                  <th className={"thcell"}>Notes</th>
                 </tr>
               </thead>
               <tbody>
                 {batch.additions.length === 0 ? (
                   <tr>
-                    <td className={tdCell} colSpan={3}>
+                    <td className={"tdcell"} colSpan={3}>
                       No ingredients recorded.
                     </td>
                   </tr>
@@ -148,9 +178,12 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
                     const when = a.addedAt ?? a.createdAt;
                     return (
                       <tr key={a.id}>
-                        <td className={tdCell}>{displayName}</td>
-                        <td className={tdCell}>{typeLabel}</td>
-                        <td className={tdCell}>{formatDate(when)}</td>
+                        <td className={"tdcell"}>{displayName}</td>
+                        <td className={"tdcell"}>{typeLabel}</td>
+                        <td className={"tdcell"}>{formatDate(when)}</td>
+                        <td className={"tdcell"}>{a.amount?.toString() ?? "—"}</td>
+                        <td className={"tdcell"}>{a.unit ?? "—"}</td>
+                        <td className={"tdcell"}>{a.notes?.trim() ? a.notes : "—"}</td>
                       </tr>
                     );
                   })
@@ -158,71 +191,36 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
               </tbody>
             </table>
           </div>
-
-          <dl className="grid w-full min-w-56 shrink-0 grid-cols-[auto_1fr] gap-x-4 gap-y-2 rounded-lg border-2 border-golden-orange-700 bg-antique-white-100/80 p-4 text-sm lg:max-w-md">
-            <dt className="font-semibold text-foreground/90">Name</dt>
-            <dd className="nunito-sans-regular">{name}</dd>
-
-            <dt className="font-semibold text-foreground/90">Category</dt>
-            <dd className="nunito-sans-regular">{formatCategoryLabel(batch.category as BrewCategory)}</dd>
-
-            {batch.meadSubtype ? (
-              <>
-                <dt className="font-semibold text-foreground/90">Subcategory</dt>
-                <dd className="nunito-sans-regular">
-                  {formatMeadSubtypeLabel(batch.meadSubtype) ?? formatEnumLabel(batch.meadSubtype)}
-                </dd>
-              </>
-            ) : null}
-
-            <dt className="font-semibold text-foreground/90">Current ABV</dt>
-            <dd className="nunito-sans-regular">
-              {currentAbvDisplay({
-                calculatedABV: batch.calculatedABV,
-                abvRows,
-                originalGravity: batch.originalGravity,
-                finalGravity: batch.finalGravity,
-              })}
-            </dd>
-
-            <dt className="font-semibold text-foreground/90">Date started</dt>
-            <dd className="nunito-sans-regular">{formatDate(batch.startDate)}</dd>
-
-            <dt className="font-semibold text-foreground/90">Original gravity</dt>
-            <dd className="nunito-sans-regular">{formatGravity(batch.originalGravity)}</dd>
-
-            <dt className="font-semibold text-foreground/90">Current specific gravity</dt>
-            <dd className="nunito-sans-regular">{formatGravity(batch.finalGravity)}</dd>
-          </dl>
         </div>
+          
 
-        <div className={`min-h-0 flex-1 ${tableWrap}`}>
-          <h2 className="border-b-2 border-golden-orange-700 bg-golden-orange-100/60 px-3 py-2 text-lg font-semibold">
+        <div className="min-h-0 flex-1 table-wrap shadow-style">
+          <h2 className="border-b-2 border-harvest-orange-600 bg-golden-orange-100/60 px-3 py-2 text-lg font-semibold">
             Events
           </h2>
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th className={thCell}>When</th>
-                <th className={thCell}>Type</th>
-                <th className={thCell}>Title</th>
-                <th className={thCell}>Description</th>
+                <th className={"thcell"}>When</th>
+                <th className={"thcell"}>Type</th>
+                <th className={"thcell"}>Title</th>
+                <th className={"thcell"}>Description</th>
               </tr>
             </thead>
             <tbody>
               {batch.events.length === 0 ? (
                 <tr>
-                  <td className={tdCell} colSpan={4}>
+                  <td className={"tdcell"} colSpan={4}>
                     No events yet.
                   </td>
                 </tr>
               ) : (
                 batch.events.map((ev) => (
                   <tr key={ev.id}>
-                    <td className={`${tdCell} whitespace-nowrap`}>{formatDateTime(ev.occurredAt)}</td>
-                    <td className={tdCell}>{formatEventType(ev.eventType)}</td>
-                    <td className={tdCell}>{ev.title}</td>
-                    <td className={tdCell}>{ev.description?.trim() ? ev.description : "—"}</td>
+                    <td className={`tdcell whitespace-nowrap`}>{formatDateTime(ev.occurredAt)}</td>
+                    <td className={"tdcell"}>{formatEventType(ev.eventType)}</td>
+                    <td className={"tdcell"}>{ev.title}</td>
+                    <td className={"tdcell"}>{ev.description?.trim() ? ev.description : "—"}</td>
                   </tr>
                 ))
               )}

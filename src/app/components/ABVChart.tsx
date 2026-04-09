@@ -41,7 +41,7 @@ export function ABVChart({
     abv: data.abv,
   }))
   return (
-    <Card className="bg-antique-white-100 border-2 border-golden-orange-700">
+    <Card className="bg-antique-white-100 border-2 border-golden-orange-700 shadow-style">
       <CardHeader>
         <CardTitle>ABV Timeline</CardTitle>
       </CardHeader>

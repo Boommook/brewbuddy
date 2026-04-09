@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -6,9 +8,10 @@ interface ImageEditProps {
     batchId: string;
     setThumbnailImageUrl: (url: string) => void;
     setShowImageEdit: (show: boolean) => void;
+    onSaved?: () => void;
 }
 
-export default function ImageEdit({ batchId, setThumbnailImageUrl, setShowImageEdit }: ImageEditProps) {
+export default function ImageEdit({ batchId, setThumbnailImageUrl, setShowImageEdit, onSaved }: ImageEditProps) {
     const [coverImage, setCoverImage] = useState<File | null>(null);
     const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
     const [formError, setFormError] = useState<string | null>(null);
@@ -20,6 +23,7 @@ export default function ImageEdit({ batchId, setThumbnailImageUrl, setShowImageE
         setSubmitting(true);
         if(!coverImage) {
             setFormError("Please select an image");
+            setSubmitting(false);
             return;
         }
 
@@ -38,20 +42,27 @@ export default function ImageEdit({ batchId, setThumbnailImageUrl, setShowImageE
             }
             setThumbnailImageUrl(data.url);
 
-            await fetch(`/api/batches/${batchId}/thumbnail`, {
+            const thumbRes = await fetch(`/api/batches/${batchId}/thumbnail`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: batchId, thumbnailImageUrl: data.url })
             });
+            const thumbJson = (await thumbRes.json().catch(() => ({}))) as {
+                ok?: boolean;
+                error?: string;
+            };
+            if (!thumbRes.ok || !thumbJson?.ok) {
+                throw new Error(thumbJson?.error ?? "Failed to save thumbnail");
+            }
+            onSaved?.();
+            setShowImageEdit(false);
         } catch (error) {
             setFormError(error instanceof Error ? error.message : "Failed to upload cover image");
             setCoverImage(null);
             setCoverImageUrl(null);
-            setShowImageEdit(false);
         } finally {
             setSubmitting(false);
         }
-        setShowImageEdit(false);
     }
 
     return (
@@ -93,6 +104,7 @@ export default function ImageEdit({ batchId, setThumbnailImageUrl, setShowImageE
                 {submitting ? "Saving..." : "Save"}
               </Button>
               <Button
+                type="button"
                 className="shadow-style bg-cayenne-red w-[40%] hover:bg-cayenne-red-700 button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-800"
                 disabled={submitting}
                 onClick={() => setShowImageEdit(false)}>
