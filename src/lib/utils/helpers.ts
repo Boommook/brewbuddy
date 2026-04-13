@@ -19,4 +19,3 @@ export function calculateABV(oG: string | null, fG: string | null): number {
 export function calculateABVNumber(oG: number, fG: number): number {
     return Number(((oG - fG) * 131.25 ).toFixed(2));
 }
-

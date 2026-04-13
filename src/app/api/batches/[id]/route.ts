@@ -5,13 +5,15 @@ export async function PUT(req: Request){
   const {id} = await req.json();
   let body: unknown;
   try {
-    body = await req.json();
+    body = await req.body;
   } catch {
     return NextResponse.json(
       { ok: false, error: "Invalid JSON" },
       { status: 400 }
     );
   }
+
+  console.log(body);
 
   const isFavorite =
     typeof body === "object" &&

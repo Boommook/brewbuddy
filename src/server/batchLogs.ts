@@ -108,7 +108,7 @@ export async function createBatchEventLog(input: {
 
   const allowsIngredients =
     input.eventType === EventType.STABILIZED ||
-    input.eventType === EventType.BACKSWEETENED;
+    input.eventType === EventType.BACKSWEETENED || EventType.INGREDIENT_ADDED;
 
   const rawAdds = input.additions;
   if (

@@ -172,6 +172,44 @@ export async function getBatchPageData(batchId: string) {
   return { batch, abvRows };
 }
 
+export async function updateBatchName(batchId: string, name: string) {
+  const userId = await getUserId();
+  if(!userId) throw new Error("User not found");
+
+  const updated = await prisma.batch.updateMany({
+    where: {id: batchId, userId},
+    data: {name: name}
+  });
+
+  // error checking for batch not found
+  if (updated.count === 0) {
+    const exists = await prisma.batch.findFirst({
+      where: { id: batchId },
+      select: { id: true },
+    });
+    if (!exists) throw new Error("Batch not found");
+    throw new Error("Unauthorized");
+  }
+
+  // return the updated batch as a DTO
+  const batch = await prisma.batch.findFirstOrThrow({
+    where: { id: batchId, userId },
+  });
+  return toBatchDTO(batch);  
+}
+
+export async function getBatchName(batchId: string){
+  const userId = await getUserId();
+  if(!userId) throw new Error("User not found");
+
+  const name = await prisma.batch.findFirstOrThrow({
+    where: {id: batchId, userId},
+    select: {id: true, name: true}
+  });
+
+  return name;
+}
+
 type BatchPatch = {
   isFavorite?: boolean;
   thumbnailImageUrl?: string | null;

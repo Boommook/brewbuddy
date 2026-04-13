@@ -10,16 +10,22 @@ import {
 import { calculateABV } from "@/src/lib/utils/helpers";
 import type { IngredientType, EventType, MeadSubtype } from "@/src/generated/prisma/index.js";
 import BackButton from "../../components/BackButton";
+import { Pencil } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import BatchName from "../../components/BatchName";
 
+// function to format the category label from the all caps value to the human readable label
 function formatCategoryLabel(category: BrewCategory): string {
   return BREW_CATEGORIES.find((c) => c.value === category)?.label ?? category;
 }
 
+// function to format the mead subtype label from the all caps value to the human readable label -- essentially the same as the category label function
 function formatMeadSubtypeLabel(subtype: MeadSubtype | null): string | null {
   if (!subtype) return null;
   return MEAD_SUBCATEGORIES.find((m) => m.value === subtype)?.label ?? null;
 }
 
+// function to format the enum label from the all caps value to the human readable label
 function formatEnumLabel(value: string): string {
   return value
     .toLowerCase()
@@ -28,15 +34,18 @@ function formatEnumLabel(value: string): string {
     .join(" ");
 }
 
+// function to format the ingredient type label from the all caps value to the human readable label
 function formatIngredientType(type: IngredientType | null | undefined): string {
   if (!type) return "—";
   return formatEnumLabel(type);
 }
 
+// function to format the event type label from the all caps value to the human readable label
 function formatEventType(type: EventType): string {
   return formatEnumLabel(type);
 }
 
+// function to format the date from the Date object to the human readable date
 function formatDate(d: Date | null | undefined): string {
   if (!d) return "—";
   return d.toLocaleDateString(undefined, {
@@ -101,7 +110,10 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
     <div className="my-8 flex h-full w-[90vw] flex-col gap-4 rounded-xl border-2 border-golden-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs mx-auto">
       <div className="flex flex-row items-center w-full">
         <BackButton/>
-        <h1 className="text-2xl font-bold flex flex-col items-center justify-center text-harvest-orange-900 mx-auto">{name} <hr className="border-cayenne-red-700 border-2 w-full" /></h1>
+        <div className="flex flex-col items-center justify-center mx-auto">
+          
+          <BatchName batchId={id}/>
+        </div>
 
       </div>
       <div className="flex flex-row gap-8">

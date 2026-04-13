@@ -51,7 +51,7 @@ export default function BatchPageThumbnail({
         <Button
           type="button"
           size="icon"
-          className="absolute top-2 right-2 shadow-style border-none size-10 rounded-full button-style bg-bright-blue hover:bg-bright-blue-700 text-antique-white"
+          className="absolute top-2 right-2 edit-button"
           aria-label="Edit batch image"
           onClick={() => setShowImageEdit(true)}
         >

@@ -13,6 +13,7 @@ export const BATCH_LOG_OPTIONS: { value: string; label: string; group: string }[
     { value: "m:ABV_ESTIMATE", label: "ABV (estimate)", group: "Measurements" },
     { value: "e:PITCHED_YEAST", label: "Pitched yeast", group: "Events" },
     { value: "e:NUTRIENT_ADDED", label: "Nutrient added", group: "Events" },
+    { value: "e:INGREDIENT_ADDED", label: "Ingredient added", group: "Events"},
     { value: "e:TRANSFERRED", label: "Transferred", group: "Events" },
     { value: "e:STABILIZED", label: "Stabilized", group: "Events" },
     { value: "e:BACKSWEETENED", label: "Backsweetened", group: "Events" },
@@ -26,6 +27,7 @@ export const BATCH_LOG_OPTIONS: { value: string; label: string; group: string }[
 const EVENT_DEFAULT_TITLE: Record<string, string> = {
   PITCHED_YEAST: "Pitched yeast",
   NUTRIENT_ADDED: "Nutrient addition",
+  INGREDIENT_ADDED: "Ingredient addition",
   TRANSFERRED: "Transfer",
   STABILIZED: "Stabilization",
   BACKSWEETENED: "Backsweetening",
@@ -60,6 +62,7 @@ export function defaultUnitForMeasurement(measurementType: string): string {
 const EVENT_TYPES_WITH_INGREDIENTS = new Set<string>([
   "STABILIZED",
   "BACKSWEETENED",
+  "INGREDIENT_ADDED"
 ]);
 
 export function eventTypeSupportsIngredients(eventType: string): boolean {
