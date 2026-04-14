@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
 import { deleteBatch, updateBatchFavorite } from "@/src/server/batches";
 
-export async function PUT(req: Request){
-  const {id} = await req.json();
+export async function PUT(req: Request, context: { params: Promise<{ id: string }> }){
+
   let body: unknown;
-  try {
-    body = await req.body;
+  try{
+    // get body from the body of the request
+    body = await req.json();
   } catch {
     return NextResponse.json(
       { ok: false, error: "Invalid JSON" },
       { status: 400 }
     );
   }
-
-  console.log(body);
-
+  // get id from the context of the request aka the url params
+  const id = (await context.params).id;
   const isFavorite =
     typeof body === "object" &&
     body !== null &&
@@ -23,6 +23,8 @@ export async function PUT(req: Request){
       ? (body as { isFavorite: boolean }).isFavorite
       : undefined;
 
+      console.log("Hi", isFavorite);
+      console.log(body);
 
   if (isFavorite === undefined) {
     return NextResponse.json(
