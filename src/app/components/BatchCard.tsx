@@ -103,9 +103,7 @@ export default function BatchCard({
       </Tooltip>
 
       <div
-        className="relative overflow-hidden flex flex-col items-center justify-center border-l-2 border-r-2 border-golden-orange-700 "
-        onClick={() => router.push(`/batches/${id}/log`)}
-      >
+        className="relative overflow-hidden flex flex-col items-center justify-center border-l-2 border-r-2 border-golden-orange-700">
         <BatchPageThumbnail
           batchId={id}
           imageUrl={thumbnailImageUrl}
