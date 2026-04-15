@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import { DashboardSortProvider } from "./components/DashboardSortContext";
 import { getUserId } from "../server/auth";
 import { TooltipProvider } from "./components/ui/tooltip"
 
@@ -37,15 +38,18 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-camel-300`}
       >
-        {userId && <div className="sticky top-0 z-50 shadow-lg shadow-black/20">
-        <Navbar />
-        </div>}
-        
-        <main className="honeycomb-bg flex-1">
-          <TooltipProvider>{children}</TooltipProvider>
-        </main>
-    
-          </body>
+        <DashboardSortProvider>
+          {userId && (
+            <div className="sticky top-0 z-50 shadow-lg shadow-black/20">
+              <Navbar />
+            </div>
+          )}
+
+          <main className="honeycomb-bg flex-1">
+            <TooltipProvider>{children}</TooltipProvider>
+          </main>
+        </DashboardSortProvider>
+      </body>
     </html>
   );
 }

@@ -9,10 +9,12 @@ import {
 } from "@/src/types/batch_types";
 import { calculateABV } from "@/src/lib/utils/helpers";
 import type { IngredientType, EventType, MeadSubtype } from "@/src/generated/prisma/index.js";
-import BackButton from "../../components/BackButton";
+import BackButton from "../../components/buttons/BackButton";
 import { Pencil } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import BatchName from "../../components/BatchName";
+import FavoriteButton from "../../components/buttons/FavoriteButton";
+import TrashButton from "../../components/buttons/TrashButton";
 
 // function to format the category label from the all caps value to the human readable label
 function formatCategoryLabel(category: BrewCategory): string {
@@ -108,13 +110,13 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="my-8 flex h-full w-[90vw] flex-col gap-4 rounded-xl border-2 border-golden-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs mx-auto">
-      <div className="flex flex-row items-center w-full">
+      <div className="flex flex-row items-center justify-between w-full">
         <BackButton/>
-        <div className="flex flex-col items-center justify-center mx-auto">
-          
-          <BatchName batchId={id}/>
+        <BatchName batchId={id}/>
+        <div className="flex flex-row items-center gap-2">
+          <FavoriteButton id={id} />
+          <TrashButton id={id} />
         </div>
-
       </div>
       <div className="flex flex-row gap-8">
       <div className="flex w-[30%] shrink-0 flex-col gap-4">

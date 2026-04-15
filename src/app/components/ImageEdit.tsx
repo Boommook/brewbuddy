@@ -98,8 +98,7 @@ export default function ImageEdit({ batchId, setThumbnailImageUrl, setShowImageE
             <div className="flex justify-between gap-4">
               <Button
                 type="submit"
-                className="bg-golden-orange-600 w-[40%] hover:bg-golden-orange-700 
-                text-white shadow-style button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-700"
+                className="save-button w-[40%]"
               >
                 {submitting ? "Saving..." : "Save"}
               </Button>

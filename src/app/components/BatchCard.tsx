@@ -1,7 +1,5 @@
 "use client";
-import Image from "next/image";
 import { BatchCardProps } from "../../types/index";
-import { Star, EllipsisVertical, SquarePen, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   Tooltip,
@@ -10,16 +8,9 @@ import {
 } from "./ui/tooltip";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Popover,
-  PopoverContent,
-  PopoverDescription,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverTrigger,
-} from "./ui/popover"
-import ImageEdit from "./ImageEdit";
 import BatchPageThumbnail from "./BatchPageThumbnail";
+import FavoriteButton from "./buttons/FavoriteButton";
+import TrashButton from "./buttons/TrashButton";
 
 export default function BatchCard({
   id,
@@ -34,8 +25,6 @@ export default function BatchCard({
   FG,
 }: BatchCardProps) {
   const router = useRouter();
-  const [isFavorite, setIsFavorite] = useState(favourite);
-  const [showImageEdit, setShowImageEdit] = useState(false);
   const [thumbnailImageUrl, setThumbnailImageUrl] = useState(image);
   
   const urgency =
@@ -59,34 +48,6 @@ export default function BatchCard({
           : "bg-yellow-600/60"
         : "bg-orange-600/60"
       : "bg-red-600/60";
-
-  const handleFavorite = () => {
-    const next = !isFavorite;
-    setIsFavorite(next);
-    fetch(`/api/batches/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isFavorite: next }),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          setIsFavorite(!next);
-          return;
-        }
-        await res.json();
-        router.refresh();
-      })
-      .catch(() => setIsFavorite(!next));
-  };
-
-  const handleDelete = () => {
-    fetch(`/api/batches/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    })
-    .then(() => router.refresh());
-  };
 
   return (
     <div className="hover:cursor-pointer w-[30vw] shadow-lg shadow-black/30 rounded-xl">
@@ -122,23 +83,8 @@ export default function BatchCard({
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                className="bg-transparent border-none text-gray-200 hover:text-golden-orange-200 rounded-full
-                 button-style hover:bg-transparent hover:border-none p-0"
-                onClick={handleFavorite}
-              >
-                <Star
-                  className={`size-6  ${isFavorite ? "fill-yellow-500" : ""}`}
-                />
-              </Button>
-
-              <Button variant="outline" className="bg-transparent border-none text-gray-200 rounded-full
-                 button-style hover:bg-transparent hover:border-none p-0 hover:text-red-700"
-                 onClick={handleDelete}
-                 >
-                <Trash2 className="size-6 " />
-              </Button>
+              <FavoriteButton id={id} />
+              <TrashButton id={id} />
             </div>
           </div>
         </TooltipTrigger>

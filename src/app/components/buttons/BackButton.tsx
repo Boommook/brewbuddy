@@ -1,6 +1,6 @@
 "use client";
 import {ArrowBigLeft} from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 
 export default function BackButton() {

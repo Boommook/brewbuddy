@@ -1,13 +1,12 @@
 import Link from "next/link";
-import { CirclePlus } from "lucide-react";
 import { getSessionUser } from "@/src/server/auth-credentials";
 import { signOutAction } from "../actions/auth";
-import { LogOut } from "lucide-react";
+import { LogOut, CirclePlus } from "lucide-react";
+import { DashboardFunnelButton } from "./DashboardFunnelButton";
 import { Button } from "./ui/button";
 
 export default async function Navbar() {
   const user = await getSessionUser();
-
   return (
     <nav className="bg-golden-orange-600 border-b-3 border-cayenne-red-600">
       <div className="flex h-[8vh] w-full items-center justify-between px-8 text-antique-white zilla-slab-bold text-3xl">
@@ -21,7 +20,7 @@ export default async function Navbar() {
               <span className="text-antique-white-100 font-bold max-w-48 truncate max-md:hidden">
                 {user.displayName ?? user.username}
               </span>
-              
+              <DashboardFunnelButton />
             </>
           ) : (
             <>

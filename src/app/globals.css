@@ -323,6 +323,11 @@ body {
   focus:outline-none focus:ring-1 focus:ring-bright-blue;
 }
 
+.save-button {
+  @apply bg-golden-orange-600 hover:bg-golden-orange-700 
+  text-antique-white-100 shadow-md shadow-black/20 hover:scale-105 hover:cursor-pointer border-2 border-golden-orange-700 hover:border-golden-orange-800;
+}
+
 .cancel-button {
   @apply bg-cayenne-red-600 hover:bg-cayenne-red-700 border-2 border-cayenne-red-700 hover:border-cayenne-red-800 text-golden-orange-200 hover:text-golden-orange-300;
 }

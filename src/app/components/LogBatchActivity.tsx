@@ -596,7 +596,7 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
           <Button
             type="submit"
             disabled={submitting}
-            className="bg-golden-orange-600 hover:bg-golden-orange-700 text-golden-orange-100 shadow-style button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-700"
+            className="save-button"
           >
             {submitting ? (
               <>

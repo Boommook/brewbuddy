@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/src/app/components/ui/button";
 import type { IngredientDTO } from "@/src/types/ingredient";
 import { Input } from "@/src/app/components/ui/input";
@@ -13,6 +13,7 @@ import {
 } from "@/src/app/components/ui/field"
 
 import { BREW_CATEGORIES, MEAD_SUBCATEGORIES, type BrewCategory, type MeadSubcategory } from "@/src/types/batch_types";
+import BackButton from "./buttons/BackButton";
 
 const CUSTOM_VALUE = "__custom__";
 
@@ -291,16 +292,7 @@ export default function CreateBatch() {
     <div className="my-8 mx-[20vw] rounded-xl border-2 border-harvest-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs">
       <div >
         <div className="mb-6 flex items-center gap-4">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-lg"
-            className="button-style text-antique-white-900 hover:bg-black/10"
-            onClick={() => router.back()}
-            aria-label="Go back"
-          >
-            <ArrowLeft className="size-8" />
-          </Button>
+          <BackButton />
           <div>
             <h1 className="zilla-slab-bold text-3xl text-gray-900">
               New batch
