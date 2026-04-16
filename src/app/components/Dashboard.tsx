@@ -16,9 +16,9 @@ function formatMeadSubtype(subtype: string | null): string | null {
     .join(" ");
 }
 
-/** matches urgency in `BatchCard` (from last check / `updatedAt`). */
+/** matches urgency in `BatchCard` (from last logged measurement or event). */
 function batchUrgency(batch: BatchDTO): number {
-  const last = new Date(batch.updatedAt).getTime();
+  const last = new Date(batch.lastLoggedAt).getTime();
   return (
     7 -
     Math.floor((Date.now() - last) / (1000 * 60 * 60 * 24))
@@ -85,7 +85,7 @@ export default function Dashboard({ batches }: { batches: BatchDTO[] }) {
                   abv={calculateABV(batch.originalGravity, batch.finalGravity)}
                   favourite={batch.isFavorite}
                   createdAt={new Date(batch.createdAt)}
-                  lastCheckedAt={new Date(batch.updatedAt)}
+                  lastCheckedAt={new Date(batch.lastLoggedAt)}
                   OG={Number(batch.originalGravity)}
                   FG={Number(batch.finalGravity)}
                 />

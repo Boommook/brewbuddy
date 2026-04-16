@@ -305,7 +305,7 @@ export async function createNewBatch(input: CreateBatchInput) {
       }
     }
 
-    // Build data object separately so we can keep type narrowing clear.
+    // build data object separately so we can keep type narrowing clear.
     const data: any = {
       userId,
       name: input.name,
@@ -313,6 +313,7 @@ export async function createNewBatch(input: CreateBatchInput) {
       status: input.status ?? BatchStatus.ACTIVE,
       currentStage: input.currentStage ?? BatchStage.PRIMARY,
       startDate,
+      lastLoggedAt: startDate,
       brewDate,
       notes: input.notes ?? undefined,
       targetVolume: input.targetVolume ?? undefined,

@@ -23,9 +23,6 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
       ? (body as { isFavorite: boolean }).isFavorite
       : undefined;
 
-      console.log("Hi", isFavorite);
-      console.log(body);
-
   if (isFavorite === undefined) {
     return NextResponse.json(
       { ok: false, error: "isFavorite boolean is required" },

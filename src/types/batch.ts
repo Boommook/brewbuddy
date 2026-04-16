@@ -32,6 +32,8 @@ export type BatchDTO = {
   notes: string | null;
   createdAt: string;
   updatedAt: string;
+  /** ISO time of last logged measurement or event; drives dashboard “last checked”. */
+  lastLoggedAt: string;
 };
 
 /** One ingredient line when creating a batch (no batchId; applied server-side). */
@@ -92,6 +94,7 @@ export type DashboardBatchListRow = {
   currentStage: BatchStage;
   createdAt: Date;
   updatedAt: Date;
+  lastLoggedAt: Date;
   originalGravity: Prisma.Decimal | null;
   finalGravity: Prisma.Decimal | null;
 };

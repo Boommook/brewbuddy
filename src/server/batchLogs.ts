@@ -53,35 +53,33 @@ export async function createBatchMeasurementLog(input: {
         note: input.note ?? null,
       },
     });
-    await tx.batch.update({
+
+    const batch = await tx.batch.findUnique({
       where: { id: input.batchId },
-      data: { updatedAt: new Date() },
     });
+    if (!batch) {
+      throw new Error("Batch not found");
+    }
+
+    const data: {
+      lastLoggedAt: Date;
+      originalGravity?: typeof input.value;
+      finalGravity?: typeof input.value;
+    } = { lastLoggedAt: input.measuredAt };
 
     if (input.measurementType === MeasurementType.SPECIFIC_GRAVITY) {
-      const batch = await tx.batch.findUnique({
-        where: { id: input.batchId },
-      });
-      if (batch?.originalGravity == null) {
-        await tx.batch.update({
-          where: { id: input.batchId },
-          data: { 
-            originalGravity: input.value,
-            finalGravity: input.value,
-            updatedAt: new Date(),
-          },
-        });
-      }
-      else{
-        await tx.batch.update({
-          where: { id: input.batchId },
-          data: { 
-            finalGravity: input.value,
-            updatedAt: new Date(),
-          },
-        });
+      if (batch.originalGravity == null) {
+        data.originalGravity = input.value;
+        data.finalGravity = input.value;
+      } else {
+        data.finalGravity = input.value;
       }
     }
+
+    await tx.batch.update({
+      where: { id: input.batchId },
+      data,
+    });
 
     return m;
   });
@@ -171,7 +169,7 @@ export async function createBatchEventLog(input: {
     await tx.batch.update({
       where: { id: input.batchId },
       data: {
-        updatedAt: new Date(),
+        lastLoggedAt: input.occurredAt,
         ...(input.newStage ? { currentStage: input.newStage } : {}),
       },
     });

@@ -155,6 +155,7 @@ model Batch {
   notes             String?
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
+  lastLoggedAt      DateTime
 
   user         User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
   additions    BatchIngredientAddition[]

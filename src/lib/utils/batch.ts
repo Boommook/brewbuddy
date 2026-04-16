@@ -24,6 +24,7 @@ export type BatchScalarFields = Pick<
   | 'notes'
   | 'createdAt'
   | 'updatedAt'
+  | 'lastLoggedAt'
   | 'thumbnailImageUrl'
   | 'isFavorite'
 >
@@ -63,6 +64,7 @@ export function toBatchDTO(batch: Batch) {
     notes: batch.notes,
     createdAt: batch.createdAt.toISOString(),
     updatedAt: batch.updatedAt.toISOString(),
+    lastLoggedAt: batch.lastLoggedAt.toISOString(),
     thumbnailImageUrl: batch.thumbnailImageUrl,
     isFavorite: batch.isFavorite,
   };
