@@ -18,7 +18,10 @@ import { redirect } from "next/navigation";
 */
 export async function getBatchesForDashboard() {
   const userId = await getUserId();
-  if (!userId) throw new Error("User not found");
+  if (!userId) {
+    redirect('/login');
+    return;
+  }
 
   const batches = await prisma.batch.findMany({
     where: {
