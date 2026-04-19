@@ -3,6 +3,7 @@
 import { NextResponse } from "next/server";
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { put } from "@vercel/blob";
 
 /*
   POST: upload a cover image
@@ -26,28 +27,15 @@ export async function POST(req: Request) {
       );
     }
 
-    // convert the file to an array buffer to handle the file data
-    const arrayBuffer = await file.arrayBuffer(); // docs: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
-    const buffer = Buffer.from(arrayBuffer);
-    // create the uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), "public", "img", "batches");
-    await fs.mkdir(uploadsDir, { recursive: true });
-    // create a safe name for the file by replacing any invalid characters with an underscore
-    const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
-    // create a timestamp for the file using the current date and time
-    const timestamp = Date.now();
-    // create a filename for the file using the timestamp and safe name
-    const filename = `${timestamp}_${safeName}`;
-    // create a file path for the file using the uploads directory and filename
-    const filePath = path.join(uploadsDir, filename);
+    const safeName = file.name.replace(/\s+/g, "-");
+    const pathname = `batch-covers/${Date.now()}-${safeName}`;
 
-    // write the file to the file path
-    await fs.writeFile(filePath, buffer);
+    const blob = await put(pathname, file, {
+      access: "public",
+    });
 
-    // create a url path for the file using the uploads directory and filename
-    const urlPath = `/img/batches/${filename}`;
-    // return the url path as a json response
-    return NextResponse.json({ ok: true, url: urlPath });
+    return NextResponse.json({ ok: true, url: blob.url, pathname: blob.pathname });
+
   } catch (error) {
     console.error("Failed to upload cover image", error);
     return NextResponse.json(
