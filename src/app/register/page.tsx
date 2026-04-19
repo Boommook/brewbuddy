@@ -3,7 +3,7 @@ import { RegisterForm } from "../components/RegisterForm";
 export default function RegisterPage() {
   return (
     <div className="flex mt-[8vh] items-center justify-center p-6">
-      <div className="w-full max-w-md rounded-xl border-2 border-antique-white-600 bg-antique-white-200/95 p-8 shadow-lg">
+      <div className="w-full max-w-md rounded-xl border-2 border-antique-white-600 bg-camel/75 backdrop-blur-sm p-8 shadow-lg">
         <h1 className="zilla-slab-bold text-3xl mb-1 pl-1 text-cayenne-red-900">Register</h1>
         <hr className="border-2 mb-6 rounded-full w-1/3 border-cayenne-red-700" />
         <RegisterForm />

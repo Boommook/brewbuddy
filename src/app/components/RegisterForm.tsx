@@ -86,13 +86,13 @@ export function RegisterForm() {
         />
       </div>
 
-      <Button type="submit" className="mt-2 w-full hover:cursor-pointer bg-cayenne-red-700 hover:bg-cayenne-red-800" disabled={pending}>
+      <Button type="submit" className="mt-2 w-full save-button" disabled={pending}>
         {pending ? "Creating account…" : "Create account"}
       </Button>
 
-      <p className="text-center text-sm text-gray-600">
+      <p className="text-center text-sm text-gray-700">
         Already have an account?{" "}
-        <Link href="/login" className="font-medium underline text-golden-orange-700">
+        <Link href="/login" className="font-medium underline text-bright-blue-700">
           Log in
         </Link>
       </p>

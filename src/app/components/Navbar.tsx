@@ -17,7 +17,7 @@ export default async function Navbar() {
         <div className="flex items-center gap-6 text-xl font-normal">
           {user ? (
             <>
-              <span className="text-antique-white-100 font-bold max-w-48 truncate max-md:hidden">
+              <span className=" font-bold max-w-48 truncate max-md:hidden">
                 {user.displayName ?? user.username}
               </span>
               <DashboardFunnelButton />
@@ -32,13 +32,13 @@ export default async function Navbar() {
               </Link>
             </>
           )}
-          <Link href="/createbatch" className="button-style rounded-full">
+          <Link href="/createbatch" className="navbar-buttons rounded-full">
             <CirclePlus className="size-10 rounded-full p-1" />
           </Link>
           {user && <form action={signOutAction}>
                 <Button
                   type="submit"
-                  className="button-style rounded-full flex items-center bg-transparent justify-center p-1 "
+                  className="navbar-buttons rounded-full flex items-center bg-transparent justify-center p-1 "
                 >
                   <LogOut className="size-8" strokeWidth={2} />
                 </Button>

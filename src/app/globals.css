@@ -323,6 +323,10 @@ body {
   focus:outline-none focus:ring-1 focus:ring-bright-blue;
 }
 
+.navbar-buttons {
+  @apply hover:scale-105 hover:cursor-pointer text-antique-white-100 hover:text-antique-white-200;
+}
+
 .save-button {
   @apply bg-golden-orange-600 hover:bg-golden-orange-700 
   text-antique-white-100 shadow-md shadow-black/20 hover:scale-105 hover:cursor-pointer border-2 border-golden-orange-700 hover:border-golden-orange-800;

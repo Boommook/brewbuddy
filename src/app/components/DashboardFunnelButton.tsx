@@ -19,7 +19,7 @@ export function DashboardFunnelButton() {
         <Button
           type="button"
           aria-label="Filter batches"
-          className="button-style rounded-full flex items-center bg-transparent justify-center p-1 text-antique-white-100"
+          className="navbar-buttons rounded-full flex items-center bg-transparent justify-center p-1 text-antique-white-100"
         >
       <Funnel className="size-8" strokeWidth={2} />
     </Button>
