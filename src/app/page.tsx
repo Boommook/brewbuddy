@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { getUserId } from "../server/auth";
 import Dashboard from "./components/Dashboard";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getBatchesForDashboard } from "@/src/server/batches";
 
 export default async function Home() {
@@ -9,6 +9,9 @@ export default async function Home() {
   const batches = await getBatchesForDashboard();
   if (!userId) {
     redirect("/login");
+  }
+  if (!batches) {
+    notFound();
   }
   return (
     <div className="flex h-full font-sans">
