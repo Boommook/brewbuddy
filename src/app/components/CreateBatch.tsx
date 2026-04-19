@@ -63,7 +63,7 @@ export default function CreateBatch() {
   // state for the cover image. this is the file object of the cover image (used to send the file to the server)
   const [coverImage, setCoverImage] = useState<File | null>(null);
   // state for the cover image url. this is the url of the cover image (used to actually display the cover image)
-  // the image is actually stored in the public/img/batches folder and the url is the path to the image
+  // the image is actually stored in the vercel blob storage
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
 
   /*

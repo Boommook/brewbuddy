@@ -1,15 +1,12 @@
 // this file was mostly created by Cursor
 
 import { NextResponse } from "next/server";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { put } from "@vercel/blob";
 
 /*
   POST: upload a cover image
   this route is used to upload a cover image to the server
-  the image is stored in the public/img/batches folder
-  the url is the path to the image
+  the image is stored in the vercel blob storage
 */
 export async function POST(req: Request) {
   // try to upload the cover image
