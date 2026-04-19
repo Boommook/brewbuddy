@@ -11,6 +11,7 @@ import {
 import type { CreateBatchAdditionPayload, CreateBatchInput } from "../types/batch";
 import { toBatchDTO } from "../lib/utils/batch";
 import { calculateABVNumber } from "../lib/utils/helpers";
+import { redirect } from "next/navigation";
 
 /*
   return all active batches of the current user
@@ -47,7 +48,10 @@ export async function getBatchById(batchId: string){
 */
 export async function deleteBatch(batchId: string){
   const userId = await getUserId();
-  if(!userId) throw new Error("User not found");
+  if(!userId) {
+    redirect('/login');
+    return;
+  }
 
   // delete the batch
   const deletedBatch = await prisma.batch.delete({
@@ -174,7 +178,10 @@ export async function getBatchPageData(batchId: string) {
 
 export async function updateBatchName(batchId: string, name: string) {
   const userId = await getUserId();
-  if(!userId) throw new Error("User not found");
+  if(!userId) {
+    redirect('/login');
+    return;
+  }
 
   const updated = await prisma.batch.updateMany({
     where: {id: batchId, userId},
@@ -200,7 +207,10 @@ export async function updateBatchName(batchId: string, name: string) {
 
 export async function getBatchName(batchId: string){
   const userId = await getUserId();
-  if(!userId) throw new Error("User not found");
+  if(!userId) {
+    redirect('/login');
+    return;
+  }
 
   const name = await prisma.batch.findFirstOrThrow({
     where: {id: batchId, userId},
@@ -222,7 +232,10 @@ type BatchPatch = {
 */
 export async function updateBatch(batchId: string, patch: BatchPatch) {
   const userId = await getUserId();
-  if (!userId) throw new Error("User not found");
+  if (!userId) {
+    redirect('/login');
+    return;
+  }
 
   // build the data object to update
   const data: { isFavorite?: boolean; thumbnailImageUrl?: string | null } = {};
@@ -269,7 +282,10 @@ export async function updateBatchThumbnail(batchId: string, thumbnailImageUrl: s
 
 export async function createNewBatch(input: CreateBatchInput) {
   const userId = await getUserId();
-  if (!userId) throw new Error("User not found");
+  if (!userId) {
+    redirect('/login');
+    return;
+  }
 
   const startDate = input.startDate ? new Date(input.startDate) : new Date();
   if (Number.isNaN(startDate.getTime())) {
