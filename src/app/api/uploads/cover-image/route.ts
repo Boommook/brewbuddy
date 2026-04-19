@@ -9,6 +9,7 @@ import { put } from "@vercel/blob";
   the image is stored in the vercel blob storage
 */
 export async function POST(req: Request) {
+  console.log("COVER IMAGE ROUTE: blob version hit");
   // try to upload the cover image
   try {
     // get the form data from the request
