@@ -5,6 +5,9 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
     try {
         const id = (await context.params).id;
         const batch = await getBatchName(id);
+        if (!batch) {
+            return NextResponse.json({ ok: false, error: "Batch not found" }, { status: 404 });
+        }
         return NextResponse.json({ ok: true, name: batch.name });
     } catch (e) {
         return NextResponse.json({ ok: false, error: "Failed to get batch name" }, { status: 500 });
