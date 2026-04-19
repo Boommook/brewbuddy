@@ -58,7 +58,6 @@
           } catch (error) {
               setFormError(error instanceof Error ? error.message : "Failed to upload cover image");
               setCoverImage(null);
-              setCoverImageUrl(null);
           } finally {
               setSubmitting(false);
           }
