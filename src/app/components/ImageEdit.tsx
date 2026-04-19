@@ -13,7 +13,6 @@
 
   export default function ImageEdit({ batchId, setThumbnailImageUrl, setShowImageEdit, onSaved }: ImageEditProps) {
       const [coverImage, setCoverImage] = useState<File | null>(null);
-      const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
       const [formError, setFormError] = useState<string | null>(null);
       const [submitting, setSubmitting] = useState(false);
 
