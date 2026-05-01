@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/src/app/components/ui/button";
@@ -11,13 +11,37 @@ import {
   FieldDescription,
   FieldLabel,
 } from "@/src/app/components/ui/field"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/src/app/components/ui/select"
+import IngredientAddition from "./IngredientAddition";
+
 
 import { BREW_CATEGORIES, MEAD_SUBCATEGORIES, type BrewCategory, type MeadSubcategory } from "@/src/types/batch_types";
 import BackButton from "./buttons/BackButton";
-
+import { groupIngredientsByType } from "@/src/lib/ingredientCatalog";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/src/app/components/ui/collapsible"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/src/app/components/ui/dropdown-menu"
 const CUSTOM_VALUE = "__custom__";
 
-type AdditionRow = {
+export type AdditionRow = {
   id: string;
   selectValue: string;
   customName: string;
@@ -41,6 +65,7 @@ export default function CreateBatch() {
   const router = useRouter();
   // state for the ingredients. this is an array of ingredient DTOs
   const [ingredients, setIngredients] = useState<IngredientDTO[]>([]);
+  const [rows, setRows] = useState<AdditionRow[]>([]);
   const [catalogError, setCatalogError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
@@ -55,7 +80,6 @@ export default function CreateBatch() {
   const [targetVolume, setTargetVolume] = useState("");
   const [originalGravity, setOriginalGravity] = useState("");
   const [notes, setNotes] = useState("");
-  const [rows, setRows] = useState<AdditionRow[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -66,6 +90,7 @@ export default function CreateBatch() {
   // the image is actually stored in the vercel blob storage
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
 
+  
   /*
     function called when the cover image is changed
     1. it sends the cover image file to the server
@@ -128,7 +153,8 @@ export default function CreateBatch() {
     }
   };
 
-  /*
+ 
+/*
   useEffect hook to load the ingredient catalog when the component mounts (on page load)
   1. it fetches the ingredient catalog from the server
   2. it sets the ingredients state to the ingredient catalog
@@ -139,66 +165,72 @@ export default function CreateBatch() {
     let cancelled = false;
     // async function to fetch the ingredients
     (async () => {
-      try {
+    try {
         // fetch the ingredients
         const res = await fetch("/api/ingredients");
         // ensure the response is ok
         if (!res.ok) {
-          throw new Error("Could not load ingredient catalog");
+            throw new Error("Could not load ingredient catalog");
         }
         // get the data from the response
         const data = await res.json();
         // ensure the data is ok and is an array
         if (!cancelled && data.ok && Array.isArray(data.ingredients)) {
-          // set the ingredients state to the ingredient catalog
-          setIngredients(data.ingredients);
+            // set the ingredients state to the ingredient catalog
+            setIngredients(data.ingredients);
         }
-      } catch (e) {
+    } catch (e) {
         if (!cancelled) {
-          setCatalogError(
-            e instanceof Error ? e.message : "Could not load ingredients"
-          );
+            /*setCatalogError(
+                e instanceof Error ? e.message : "Could not load ingredients"
+            );*/
         }
-      }
+    }
     })();
     return () => {
-      cancelled = true;
+        cancelled = true;
     };
-  }, []);
+}, []);
 
-  /*
-  function called when an ingredient is selected from the catalog
-  
-  */
-  const onSelectIngredient = useCallback((rowId: string, value: string) => {
+/*
+function called when an ingredient is selected from the catalog
+*/
+const onSelectIngredient = useCallback((rowId: string, value: string) => {
     setRows((prev) =>
-      prev.map((r) => {
+    prev.map((r) => {
         if (r.id !== rowId) return r;
         if (value === CUSTOM_VALUE) {
-          return {
-            ...r,
-            selectValue: CUSTOM_VALUE,
-            customName: "",
-            unit: r.unit,
-          };
+            return {
+                ...r,
+                selectValue: CUSTOM_VALUE,
+                customName: "",
+                unit: r.unit,
+            };
         }
         if (!value) {
-          return { ...r, selectValue: "", unit: "", customName: "" };
+            return { ...r, selectValue: "", unit: "", customName: "" };
         }
         const ing = ingredients.find((i) => i.id === value);
         return {
-          ...r,
-          selectValue: value,
-          customName: "",
-          unit: ing?.defaultUnit ?? r.unit,
+            ...r,
+            selectValue: value,
+            customName: "",
+            unit: ing?.defaultUnit ?? r.unit,
         };
-      })
+    })
     );
-  }, [ingredients]);
+}, [ingredients]);
 
-  const addRow = () => setRows((r) => [...r, newRow()]);
-  const removeRow = (id: string) =>
+const addRow = () => setRows((r) => [...r, newRow()]);
+const removeRow = (id: string) =>
     setRows((r) => r.filter((x) => x.id !== id));
+
+  const groupedCatalog = useMemo(
+    () => groupIngredientsByType(ingredients),
+    [ingredients]
+  );
+
+  
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     // prevent the default form submission behavior
@@ -417,7 +449,7 @@ export default function CreateBatch() {
             </label>
           </div>
 
-          <label className="flex flex-col gap-1 items-center">
+          <div className="flex flex-col gap-1 items-center">
             <span className="text-sm font-semibold text-gray-800">
               Cover image
             </span>
@@ -430,13 +462,13 @@ export default function CreateBatch() {
             )}
             <Input
               type="file"
-              className="bg-gray-100 h-fit shadow-md hover:bg-gray-300 rounded-md border-2 hover:cursor-pointer border-gray-500 w-fit"
+              className="bg-gray-100 shadow-md hover:bg-gray-300 rounded-md border-2 hover:cursor-pointer border-gray-500 w-fit h-fit"
               accept="image/*"
               onChange={(e) => handleCoverImageChange(e)}
               placeholder="e.g. cover-image.jpg"
               autoComplete="off"
             />
-          </label>
+          </div>
 
           <label className="flex flex-col gap-1">
             <span className="text-sm font-semibold text-gray-800">Notes</span>
@@ -457,7 +489,7 @@ export default function CreateBatch() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border-antique-white-600 bg-antique-white-100 button-style hover:bg-antique-white-50"
+                className="button-style shadow-style save-button"
                 onClick={addRow}
               >
                 <Plus className="size-4" />
@@ -472,35 +504,14 @@ export default function CreateBatch() {
             ) : (
               <ul className="flex flex-col gap-4">
                 {rows.map((row) => (
-                  <li
+                  <li 
                     key={row.id}
                     className="rounded-md border border-antique-white-500 bg-antique-white-100/80 p-3"
                   >
 
                     <div className="">
                       <div className="flex w-full gap-4">
-                        <label className="flex flex-col gap-1 sm:col-span-2 w-full">
-                          <span className="text-sm font-semibold tracking-wide text-gray-700">
-                            Ingredient
-                          </span>
-                          <select
-                            className="auth-input-style w-full text-sm"
-                            value={row.selectValue}
-                            onChange={(e) =>
-                              onSelectIngredient(row.id, e.target.value)
-                            }
-                          >
-                            <option value="">— Select —</option>
-                            {ingredients.map((ing) => (
-                              <option key={ing.id} value={ing.id}>
-                                {ing.name}
-                                {ing.brand ? ` (${ing.brand})` : ""} ·{" "}
-                                {ing.ingredientType.replaceAll("_", " ")}
-                              </option>
-                            ))}
-                            <option value={CUSTOM_VALUE}>Custom name…</option>
-                          </select>
-                        </label>
+                        <IngredientAddition row={row} ingredients={ingredients} groupedCatalog={groupedCatalog} onSelectIngredient={onSelectIngredient} />
 
                         <Button
                           type="button"
@@ -509,12 +520,10 @@ export default function CreateBatch() {
                           onClick={() => removeRow(row.id)}
                           aria-label="Remove row"
                         >
-                          <Trash2 className="size-4 " />
+                          <Trash2 className="size-4" />
                         </Button>
                       </div>
-                      <div>
 
-                      </div>
                       {row.selectValue === CUSTOM_VALUE && (
                         <label className="flex flex-col gap-1 sm:col-span-2">
                           <span className="text-sm font-semibold text-gray-700">
@@ -607,8 +616,7 @@ export default function CreateBatch() {
             <Button
               type="submit"
               disabled={submitting}
-              className="bg-golden-orange-600 hover:bg-golden-orange-700 
-              text-white shadow-style button-style border-2 border-cayenne-red-600 hover:border-cayenne-red-700"
+              className="save-button"
             >
               {submitting ? (
                 <>

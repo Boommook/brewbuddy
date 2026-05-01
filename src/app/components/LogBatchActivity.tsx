@@ -13,6 +13,9 @@ import {
   eventTypeSupportsIngredients,
   measurementHint,
 } from "@/src/lib/batchLogOptions";
+import BackButton from "./buttons/BackButton";
+import { groupIngredientsByType } from "@/src/lib/ingredientCatalog";
+import IngredientAddition from "./IngredientAddition";
 
 const STAGE_REQUIRED_EVENTS = new Set<string>(["STABILIZED", "TRANSFERRED"]);
 
@@ -122,6 +125,11 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
     }
     return Array.from(g.entries());
   }, []);
+
+  const groupedCatalog = useMemo(
+    () => groupIngredientsByType(ingredients),
+    [ingredients]
+  );
 
   const onLogSelectChange = (v: string) => {
     setLogSelect(v);
@@ -290,16 +298,7 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
   return (
     <div className="my-8 mx-[20vw] w-full rounded-xl border-2 border-golden-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs nunito-sans-regular">
       <div className="mb-6 flex items-center gap-4">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-lg"
-          className="button-style text-antique-white-900 hover:bg-black/10"
-          onClick={() => router.back()}
-          aria-label="Go back"
-        >
-          <ArrowLeft className="size-8" />
-        </Button>
+        <BackButton />
         <div>
           <h1 className="zilla-slab-bold text-3xl text-gray-900">
             Log batch activity
@@ -469,31 +468,16 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
                     className="rounded-md border border-antique-white-500 bg-antique-white-100/80 p-3"
                   >
                     <div className="flex w-full gap-4">
-                      <label className="flex w-full flex-col gap-1">
+                      <label className="flex w-full min-w-0 flex-col gap-1">
                         <span className="text-sm font-semibold tracking-wide text-gray-700">
                           Ingredient
                         </span>
-                        <select
-                          className="auth-input-style w-full text-sm"
-                          value={
-                            row.selectValue === CUSTOM_VALUE
-                              ? CUSTOM_VALUE
-                              : row.selectValue
-                          }
-                          onChange={(e) =>
-                            onSelectIngredient(row.id, e.target.value)
-                          }
-                        >
-                          <option value="">— Select —</option>
-                          {ingredients.map((ing) => (
-                            <option key={ing.id} value={ing.id}>
-                              {ing.name}
-                              {ing.brand ? ` (${ing.brand})` : ""} ·{" "}
-                              {ing.ingredientType.replace(/_/g, " ")}
-                            </option>
-                          ))}
-                          <option value={CUSTOM_VALUE}>Custom name…</option>
-                        </select>
+                        <IngredientAddition
+                          row={row}
+                          ingredients={ingredients}
+                          groupedCatalog={groupedCatalog}
+                          onSelectIngredient={onSelectIngredient}
+                        />
                       </label>
                       <Button
                         type="button"
