@@ -2,43 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/src/app/components/ui/button";
 import type { IngredientDTO } from "@/src/types/ingredient";
 import { Input } from "@/src/app/components/ui/input";
-import {
-  Field,
-  FieldDescription,
-  FieldLabel,
-} from "@/src/app/components/ui/field"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/src/app/components/ui/select"
-import IngredientAddition from "./IngredientAddition";
-
-
 import { BREW_CATEGORIES, MEAD_SUBCATEGORIES, type BrewCategory, type MeadSubcategory } from "@/src/types/batch_types";
 import BackButton from "./buttons/BackButton";
 import { groupIngredientsByType } from "@/src/lib/ingredientCatalog";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/src/app/components/ui/collapsible"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/src/app/components/ui/dropdown-menu"
+import IngredientLinesSection from "./IngredientLinesSection";
 const CUSTOM_VALUE = "__custom__";
 
 export type AdditionRow = {
@@ -67,7 +38,7 @@ export default function CreateBatch() {
   const [ingredients, setIngredients] = useState<IngredientDTO[]>([]);
   const [rows, setRows] = useState<AdditionRow[]>([]);
   const [catalogError, setCatalogError] = useState<string | null>(null);
-
+  const [sort, setSort] = useState<"newest" | "oldest">("newest");
   const [name, setName] = useState("");
   // state for the brew category. this uses the BrewCategory type to ensure the value is valid (to avoid a random string being set)
   const [category, setCategory] = useState<BrewCategory>("MEAD");
@@ -230,7 +201,10 @@ const removeRow = (id: string) =>
     [ingredients]
   );
 
-  
+  const sortedRows = useMemo(() => {
+    if (sort === "newest") return [...rows].reverse();
+    return [...rows];
+  }, [rows, sort]);
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     // prevent the default form submission behavior
@@ -480,137 +454,27 @@ const removeRow = (id: string) =>
             />
           </label>
 
-          <section className="rounded-lg border border-antique-white-600 bg-antique-white-200/40 p-4">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-lg font-bold text-gray-900">
-                Starting ingredients
-              </h2>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="button-style shadow-style save-button"
-                onClick={addRow}
-              >
-                <Plus className="size-4" />
-                Add ingredient
-              </Button>
-            </div>
-            {rows.length === 0 ? (
-              <p className="text-sm text-gray-600">
-                Optional: add honey, fruit, water, yeast, or anything else you
-                already know. Lines left blank are ignored.
-              </p>
-            ) : (
-              <ul className="flex flex-col gap-4">
-                {rows.map((row) => (
-                  <li 
-                    key={row.id}
-                    className="rounded-md border border-antique-white-500 bg-antique-white-100/80 p-3"
-                  >
-
-                    <div className="">
-                      <div className="flex w-full gap-4">
-                        <IngredientAddition row={row} ingredients={ingredients} groupedCatalog={groupedCatalog} onSelectIngredient={onSelectIngredient} />
-
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          className="text-red-800 hover:bg-red-200 button-style rounded-lg"
-                          onClick={() => removeRow(row.id)}
-                          aria-label="Remove row"
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-
-                      {row.selectValue === CUSTOM_VALUE && (
-                        <label className="flex flex-col gap-1 sm:col-span-2">
-                          <span className="text-sm font-semibold text-gray-700">
-                            Custom name
-                          </span>
-                          <input
-                            className="auth-input-style w-full text-sm"
-                            value={row.customName}
-                            onChange={(e) =>
-                              setRows((prev) =>
-                                prev.map((r) =>
-                                  r.id === row.id
-                                    ? { ...r, customName: e.target.value }
-                                    : r
-                                )
-                              )
-                            }
-                            placeholder="e.g. Local wildflower honey"
-                          />
-                        </label>
-                      )}
-                      <div className="flex w-full gap-4">
-                      <label className="flex flex-col gap-1">
-                        <span className="text-sm font-semibold text-gray-700">
-                          Amount
-                        </span>
-                        <input
-                          className="auth-input-style w-full text-sm"
-                          inputMode="decimal"
-                          value={row.amount}
-                          onChange={(e) =>
-                            setRows((prev) =>
-                              prev.map((r) =>
-                                r.id === row.id
-                                  ? { ...r, amount: e.target.value }
-                                  : r
-                              )
-                            )
-                          }
-                        />
-                      </label>
-                      
-                      <label className="flex flex-col gap-1">
-                        <span className="text-sm font-semibold text-gray-700">
-                          Unit
-                        </span>
-                        <input
-                          className="auth-input-style w-full text-sm"
-                          value={row.unit}
-                          onChange={(e) =>
-                            setRows((prev) =>
-                              prev.map((r) =>
-                                r.id === row.id
-                                  ? { ...r, unit: e.target.value }
-                                  : r
-                              )
-                            )
-                          }
-                          placeholder="lb, gal, g…"
-                        />
-                      </label>
-                      </div>
-
-                      <label className="flex flex-col gap-1 sm:col-span-2">
-                        <span className="text-sm font-semibold text-gray-700">
-                          Line notes <span className="font-normal">(optional)</span>
-                        </span>
-                        <input
-                          className="auth-input-style w-full text-sm"
-                          value={row.notes}
-                          onChange={(e) =>
-                            setRows((prev) =>
-                              prev.map((r) =>
-                                r.id === row.id
-                                  ? { ...r, notes: e.target.value }
-                                  : r
-                              )
-                            )
-                          }
-                        />
-                      </label>
-                      </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+          <IngredientLinesSection
+            title="Starting ingredients"
+            description="Add the ingredients you're using to start your batch."
+            emptyMessage={
+              <>
+                Optional: add honey, fruit, water, yeast, or anything else you already
+                know. Lines left blank are ignored.
+              </>
+            }
+            rows={sortedRows}
+            ingredients={ingredients}
+            groupedCatalog={groupedCatalog}
+            onSelectIngredient={onSelectIngredient}
+            setRows={setRows}
+            onAddRow={addRow}
+            onRemoveRow={removeRow}
+            sort={sort}
+            setSort={setSort}
+            customNamePlaceholder="e.g. Local wildflower honey"
+            unitPlaceholder="lb, gal, g…"
+          />
 
           <div className="flex flex-wrap gap-3">
             <Button

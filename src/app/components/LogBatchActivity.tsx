@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/src/app/components/ui/button";
 import type { IngredientDTO } from "@/src/types/ingredient";
 import {
@@ -15,7 +15,7 @@ import {
 } from "@/src/lib/batchLogOptions";
 import BackButton from "./buttons/BackButton";
 import { groupIngredientsByType } from "@/src/lib/ingredientCatalog";
-import IngredientAddition from "./IngredientAddition";
+import IngredientLinesSection from "./IngredientLinesSection";
 
 const STAGE_REQUIRED_EVENTS = new Set<string>(["STABILIZED", "TRANSFERRED"]);
 
@@ -67,7 +67,7 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
   const router = useRouter();
   const [ingredients, setIngredients] = useState<IngredientDTO[]>([]);
   const [catalogError, setCatalogError] = useState<string | null>(null);
-
+  const [sort, setSort] = useState<"newest" | "oldest">("newest");
   const [logSelect, setLogSelect] = useState<string>(DEFAULT_LOG_SELECT);
   const [valueStr, setValueStr] = useState("");
   const [unit, setUnit] = useState(defaultUnitForMeasurement("SPECIFIC_GRAVITY"));
@@ -92,6 +92,14 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
 
   const requiresNewStage =
     !isMeasurement && STAGE_REQUIRED_EVENTS.has(eventType);
+
+  const sortedRows = useMemo(() => {
+    if (sort === "newest") {
+      return [...rows].reverse();
+    } else {
+      return [...rows];
+    }
+  }, [rows, sort]);
 
   useEffect(() => {
     let cancelled = false;
@@ -435,145 +443,26 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
         )}
 
         {showIngredients ? (
-          <section className="rounded-lg border border-antique-white-600 bg-antique-white-200/40 p-4">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="heading-style text-lg font-bold text-gray-900">
-                Ingredients added/used
-              </h2>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="border-antique-white-600 bg-antique-white-100 button-style hover:bg-antique-white-50"
-                onClick={addRow}
-              >
-                <Plus className="size-4" />
-                Add ingredient
-              </Button>
-            </div>
-            <p className="mb-3 text-style text-sm text-gray-600">
-              Log stabilizers, sweetening agents, or other additions used for this
-              step. Lines left blank are ignored.
-            </p>
-            {rows.length === 0 ? (
-              <p className="text-style text-sm text-gray-600">
-                No ingredient lines yet — add one if this step included
-                additions.
-              </p>
-            ) : (
-              <ul className="flex flex-col gap-4">
-                {rows.map((row) => (
-                  <li
-                    key={row.id}
-                    className="rounded-md border border-antique-white-500 bg-antique-white-100/80 p-3"
-                  >
-                    <div className="flex w-full gap-4">
-                      <label className="flex w-full min-w-0 flex-col gap-1">
-                        <span className="text-sm font-semibold tracking-wide text-gray-700">
-                          Ingredient
-                        </span>
-                        <IngredientAddition
-                          row={row}
-                          ingredients={ingredients}
-                          groupedCatalog={groupedCatalog}
-                          onSelectIngredient={onSelectIngredient}
-                        />
-                      </label>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="rounded-lg text-red-800 button-style hover:bg-red-200"
-                        onClick={() => removeRow(row.id)}
-                        aria-label="Remove row"
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </div>
-                    {row.selectValue === CUSTOM_VALUE ? (
-                      <label className="mt-2 flex flex-col gap-1">
-                        <span className="text-sm font-semibold text-gray-700">
-                          Custom name
-                        </span>
-                        <input
-                          className="auth-input-style w-full text-sm"
-                          value={row.customName}
-                          onChange={(e) =>
-                            setRows((prev) =>
-                              prev.map((r) =>
-                                r.id === row.id
-                                  ? { ...r, customName: e.target.value }
-                                  : r
-                              )
-                            )
-                          }
-                          placeholder="e.g. Potassium sorbate"
-                        />
-                      </label>
-                    ) : null}
-                    <div className="mt-2 flex w-full gap-4">
-                      <label className="flex flex-col gap-1">
-                        <span className="text-sm font-semibold text-gray-700">
-                          Amount
-                        </span>
-                        <input
-                          className="auth-input-style w-full text-sm"
-                          inputMode="decimal"
-                          value={row.amount}
-                          onChange={(e) =>
-                            setRows((prev) =>
-                              prev.map((r) =>
-                                r.id === row.id
-                                  ? { ...r, amount: e.target.value }
-                                  : r
-                              )
-                            )
-                          }
-                        />
-                      </label>
-                      <label className="flex flex-col gap-1">
-                        <span className="text-sm font-semibold text-gray-700">
-                          Unit
-                        </span>
-                        <input
-                          className="auth-input-style w-full text-sm"
-                          value={row.unit}
-                          onChange={(e) =>
-                            setRows((prev) =>
-                              prev.map((r) =>
-                                r.id === row.id
-                                  ? { ...r, unit: e.target.value }
-                                  : r
-                              )
-                            )
-                          }
-                          placeholder="tsp, g, oz…"
-                        />
-                      </label>
-                    </div>
-                    <label className="mt-2 flex flex-col gap-1">
-                      <span className="text-sm font-semibold text-gray-700">
-                        Line notes{" "}
-                        <span className="font-normal">(optional)</span>
-                      </span>
-                      <input
-                        className="auth-input-style w-full text-sm"
-                        value={row.notes}
-                        onChange={(e) =>
-                          setRows((prev) =>
-                            prev.map((r) =>
-                              r.id === row.id
-                                ? { ...r, notes: e.target.value }
-                                : r
-                            )
-                          )
-                        }
-                      />
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+          <IngredientLinesSection
+            title="Ingredients added/used"
+            description="Log stabilizers, sweetening agents, or other additions used for this step. Lines left blank are ignored."
+            emptyMessage={
+              <>
+                No ingredient lines yet — add one if this step included additions.
+              </>
+            }
+            rows={sortedRows}
+            ingredients={ingredients}
+            groupedCatalog={groupedCatalog}
+            onSelectIngredient={onSelectIngredient}
+            setRows={setRows}
+            onAddRow={addRow}
+            onRemoveRow={removeRow}
+            sort={sort}
+            setSort={setSort}
+            customNamePlaceholder="e.g. Potassium sorbate"
+            unitPlaceholder="tsp, g, oz…"
+          />
         ) : null}
 
         <div className="flex flex-wrap gap-3">

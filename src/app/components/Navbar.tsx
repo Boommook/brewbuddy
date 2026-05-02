@@ -4,6 +4,7 @@ import { signOutAction } from "../actions/auth";
 import { LogOut, CirclePlus } from "lucide-react";
 import { DashboardFunnelButton } from "./DashboardFunnelButton";
 import { Button } from "./ui/button";
+import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 
 export default async function Navbar() {
   const user = await getSessionUser();
@@ -32,9 +33,16 @@ export default async function Navbar() {
               </Link>
             </>
           )}
-          <Link href="/createbatch" className="navbar-buttons rounded-full">
-            <CirclePlus className="size-10 rounded-full p-1" />
-          </Link>
+          <Tooltip>
+            <TooltipTrigger>
+              <Link href="/createbatch" className="navbar-buttons rounded-full">
+                <CirclePlus className="size-10 rounded-full p-1" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>Create a new batch</p>
+            </TooltipContent>
+          </Tooltip>
           {user && <form action={signOutAction}>
                 <Button
                   type="submit"

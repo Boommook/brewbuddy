@@ -319,8 +319,8 @@ body {
 }
 
 .auth-input-style {
-  @apply rounded-md border border-camel-400 px-3 py-2 bg-antique-white-100  text-gray-900 inset-shadow-md
-  focus:outline-none focus:ring-1 focus:ring-bright-blue;
+  @apply rounded-md border border-camel-400 px-3 py-2 bg-antique-white-100  text-gray-900 
+  focus:outline-none focus:ring-1 focus:ring-bright-blue inset-shadow-md inset-shadow-black/25;
 }
 
 .navbar-buttons {
