@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 
-export default function FavoriteButton({ id }: { id: string }) {
+export default function FavoriteButton({ id, lightColor = false }: { id: string, lightColor?: boolean }) {
     const router = useRouter();
     const [isFavorite, setIsFavorite] = useState(false);
 
@@ -31,8 +31,8 @@ export default function FavoriteButton({ id }: { id: string }) {
     return (
         <Button
         variant="outline"
-        className="bg-transparent border-none text-gray-200 hover:text-golden-orange-200 rounded-full
-            button-style hover:bg-transparent hover:border-none p-0"
+        className={`bg-transparent border-none ${lightColor ? "text-gray-200" : "text-cayenne-red-900"} hover:text-golden-orange-200 rounded-full
+            button-style hover:bg-transparent hover:border-none p-0`}
         onClick={handleFavorite}
         >
             <Star

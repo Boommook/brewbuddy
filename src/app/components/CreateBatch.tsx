@@ -10,6 +10,7 @@ import { BREW_CATEGORIES, MEAD_SUBCATEGORIES, type BrewCategory, type MeadSubcat
 import BackButton from "./buttons/BackButton";
 import { groupIngredientsByType } from "@/src/lib/ingredientCatalog";
 import IngredientLinesSection from "./IngredientLinesSection";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 const CUSTOM_VALUE = "__custom__";
 
 export type AdditionRow = {
@@ -477,20 +478,27 @@ const removeRow = (id: string) =>
           />
 
           <div className="flex flex-wrap gap-3">
-            <Button
-              type="submit"
-              disabled={submitting}
-              className="save-button"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" />
-                  Creating…
-                </>
-              ) : (
-                "Create batch"
-              )}
-            </Button>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  type="submit"
+                  disabled={submitting}
+                  className={`${name !== "" && rows.length > 0 ? "save-button" : "button-style hover:cursor-not-allowed! shadow-style bg-gray-400 scale-none! border-2 border-gray-600  text-antique-white-100"}`}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Creating…
+                    </>
+                  ) : (
+                    "Create batch"
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {name !== "" && rows.length > 0 ? <p>Create a new batch</p> : <p>Complete the required fields to create a new batch</p>}
+              </TooltipContent>
+            </Tooltip>
             <Button
               type="button"
               variant="outline"

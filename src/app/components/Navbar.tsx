@@ -43,14 +43,21 @@ export default async function Navbar() {
               <p>Create a new batch</p>
             </TooltipContent>
           </Tooltip>
-          {user && <form action={signOutAction}>
+          {user && <Tooltip>
+            <TooltipTrigger>
+              <form action={signOutAction}>
                 <Button
                   type="submit"
                   className="navbar-buttons rounded-full flex items-center bg-transparent justify-center p-1 "
                 >
                   <LogOut className="size-8" strokeWidth={2} />
                 </Button>
-              </form>}
+              </form>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>Log out</p>
+            </TooltipContent>
+          </Tooltip>}
         </div>
       </div>
     </nav>

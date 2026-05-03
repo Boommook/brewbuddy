@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function TrashButton({ id }: { id: string }) {
+export default function TrashButton({ id, lightColor = false }: { id: string, lightColor?: boolean }) {
     const router = useRouter();
     const handleDelete = () => {
         fetch(`/api/batches/${id}`, {
@@ -15,8 +15,8 @@ export default function TrashButton({ id }: { id: string }) {
       };
 
     return (
-        <Button variant="outline" className="bg-transparent border-none text-gray-200 rounded-full
-                 button-style hover:bg-transparent hover:border-none p-0 hover:text-red-700"
+        <Button variant="outline" className={`bg-transparent border-none ${lightColor ? "text-gray-200" : "text-cayenne-red-900"} rounded-full
+                 button-style hover:bg-transparent hover:border-none p-0 hover:text-red-700`}
             onClick={handleDelete}
             >
         <Trash2 className="size-6 " />

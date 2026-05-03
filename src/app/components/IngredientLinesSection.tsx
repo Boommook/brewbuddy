@@ -8,6 +8,7 @@ import type { IngredientTypeGroup } from "@/src/lib/ingredientCatalog";
 import type { AdditionRow } from "./CreateBatch";
 import IngredientAddition from "./IngredientAddition";
 import SortToggle from "./buttons/SortToggle";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const CUSTOM_VALUE = "__custom__";
 
@@ -120,9 +121,16 @@ export default function IngredientLinesSection({
               ) : null}
               <div className="mt-2 flex w-full gap-4">
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm font-semibold text-gray-700">
-                    Amount
-                  </span>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <span className="text-sm font-semibold text-gray-700 text-left flex">
+                        Amount
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                      <p>Amount must be a positive decimal number.</p>
+                    </TooltipContent>
+                  </Tooltip>
                   <input
                     className="auth-input-style w-full text-sm"
                     inputMode="decimal"

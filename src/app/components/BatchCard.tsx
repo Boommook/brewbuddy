@@ -83,8 +83,8 @@ export default function BatchCard({
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <FavoriteButton id={id} />
-              <TrashButton id={id} />
+              <FavoriteButton id={id} lightColor={true} />
+              <TrashButton id={id} lightColor={true} />
             </div>
           </div>
         </TooltipTrigger>

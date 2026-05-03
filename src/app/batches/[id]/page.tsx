@@ -113,7 +113,7 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
       <div className="flex flex-row items-center justify-between w-full">
         <BackButton/>
         <BatchName batchId={id}/>
-        <div className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center gap-2 ">
           <FavoriteButton id={id} />
           <TrashButton id={id} />
         </div>
@@ -136,6 +136,9 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
                 </dd>
               </>
             ) : null}
+
+            <dt className="font-semibold text-foreground">Batch Stage</dt>
+            <dd className="nunito-sans-regular">{formatEnumLabel(batch.currentStage)}</dd>
 
             <dt className="font-semibold text-foreground">Current ABV</dt>
             <dd className="nunito-sans-regular">
@@ -161,7 +164,7 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
           batchId={batch.id}
           imageUrl={batch.thumbnailImageUrl}
           alt={name}
-          styles="flex flex-col rounded-t-xl border-2 border-golden-orange-700 shadow-style"
+          styles="flex flex-col rounded-t-xl rounded-b-xl border-2 border-golden-orange-700 shadow-style"
         />
         
         <ABVChart ABVData={abvRows.map((row) => ({ measuredAt: row.measuredAt, abv: row.abv }))} />

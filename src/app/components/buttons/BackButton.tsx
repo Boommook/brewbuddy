@@ -10,7 +10,7 @@ export default function BackButton() {
       type="button"
       variant="ghost"
       size="icon-lg"
-      className="button-style text-header hover:bg-transparent hover:!text-cayenne-red-950 "
+      className="button-style text-header hover:bg-transparent hover:text-cayenne-red-950! "
       onClick={() => router.back()}
       aria-label="Go back"
     >
