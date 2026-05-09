@@ -4,11 +4,23 @@ A web app for homebrewers to track mead and wine batches through the fermentatio
 
 ## Features
 
-- **Dashboard** – View all active batches as cards
+- **Dashboard** – View all active batches as cards with key info.
 - **New batch** – Use the plus icon in the top right to create a new batch and fill out batch info
-- **Check-ups** – Record specific gravity, ingredient changes, equipment used, and notes. Dates stored for every check.
+- **Logging Events** - Log various events for specific batches.
+- **Check-ups** – Record specific gravity, ingredient changes, equipment used, and notes. Dates are stored for every check.
 - **Next check** – App suggests when the next check is due.
-- **Reminders** – Email reminders for upcoming checks (when configured). TODO
+
+## Future Improvements & Features
+### Navigation
+- **Undo Actions**: Allow users to undo actions such as creating a batch.
+### Forms and Inputs
+- **Support Fractional Inputs**: Convert fractional inputs to decimal in forms.
+- **Subtype Popups**: When a user hovers a mead subtype, display a pop-up with the description of the subtype.
+- **Ingredient Filtering**: Implement ingredient filtering by type such as Yeasts, Honeys, Nutrients, etc
+### Misc. Future Features
+- **Email Verification**: Require accounts to have a verified email address for security and email features.
+- **Email Reminders**: Email reminders for upcoming batch checks.
+- **Recipe Presets**: Store recipes in the database and allow users to "create" batches from the presets. Allow users to store their batch details as recipes.
 - **History** – Past batches and check data kept for reference. TODO
 
 ## Tech stack
