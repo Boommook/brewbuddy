@@ -23,8 +23,9 @@ A web app for homebrewers to track mead and wine batches through the fermentatio
 ### Misc. Future Features
 - **Email Verification**: Require accounts to have a verified email address for security and email features.
 - **Email Reminders**: Email reminders for upcoming batch checks.
+- **Custom Reminders**: Allow users to customize reminder schedule.
 - **Recipe Presets**: Store recipes in the database and allow users to "create" batches from the presets. Allow users to store their batch details as recipes.
-- **History** – Past batches and check data kept for reference. TODO
+- **History** – Past batches and check data kept for reference.
 
 ## Tech stack
 
