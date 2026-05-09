@@ -109,18 +109,6 @@ I am a frequent web developer with personal, academic, and professional experien
 
 In future iterations I will go through my repository to optimize and comment any generated code.
 
-## Incomplete
-
-- Filter ingredients based on event
-- Logging event specifics
-- Email notifications
-- More that I will add on when I remember
-
-## Future ideas
-
-- Recipe sharing and scaling to more stakeholders (e.g. competition judges).
-- Optional export of batch history (PDF/CSV).
-
 ## User constraints (from spec)
 
 - **Incomplete data** – The app tolerates partial check-up inputs (e.g. gravity only, or notes only).
