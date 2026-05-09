@@ -17,6 +17,9 @@ A web app for homebrewers to track mead and wine batches through the fermentatio
 - **Support Fractional Inputs**: Convert fractional inputs to decimal in forms.
 - **Subtype Popups**: When a user hovers a mead subtype, display a pop-up with the description of the subtype.
 - **Ingredient Filtering**: Implement ingredient filtering by type such as Yeasts, Honeys, Nutrients, etc
+## Batch Details Page
+- **ABV Timeline Improvements**: Unspecific, but I think there are a few problems with it. Investigate further.
+- **Event Details**: Display details for the display batch events. Ex: For an ingredient addition event, display the ingredient(s) added.
 ### Misc. Future Features
 - **Email Verification**: Require accounts to have a verified email address for security and email features.
 - **Email Reminders**: Email reminders for upcoming batch checks.
