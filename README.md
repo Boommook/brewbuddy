@@ -13,6 +13,7 @@ A web app for homebrewers to track mead and wine batches through the fermentatio
 ## Future Improvements & Features
 ### Navigation
 - **Undo Actions**: Allow users to undo actions such as creating a batch.
+- **Favorite Events**: Filter events by user's most used
 ### Forms and Inputs
 - **Support Fractional Inputs**: Convert fractional inputs to decimal in forms.
 - **Subtype Popups**: When a user hovers a mead subtype, display a pop-up with the description of the subtype.
@@ -25,6 +26,7 @@ A web app for homebrewers to track mead and wine batches through the fermentatio
 - **Email Reminders**: Email reminders for upcoming batch checks.
 - **Custom Reminders**: Allow users to customize reminder schedule.
 - **Recipe Presets**: Store recipes in the database and allow users to "create" batches from the presets. Allow users to store their batch details as recipes.
+- **Add Ingredients**: Allow users to add ingredients to the database
 - **History** – Past batches and check data kept for reference.
 
 ## Tech stack

@@ -36,14 +36,17 @@ export async function signUpAction(
   const password = formData.get("password");
   const confirmPassword = formData.get("confirmPassword");
   const displayName = formData.get("displayName");
+  const email = formData.get("email");
 
-  if (typeof username !== "string" || typeof password !== "string") {
+
+  if (typeof username !== "string" || typeof password !== "string" || typeof email !== "string") {
     return { error: "Invalid form submission." };
   }
 
   const result = await signUpWithCredentials({
     username,
     password,
+    email,
     confirmPassword:
       typeof confirmPassword === "string" ? confirmPassword : undefined,
     displayName:
@@ -54,7 +57,7 @@ export async function signUpAction(
     return { error: result.error };
   }
 
-  redirect("/");
+  redirect("/check-email");
 }
 
 export async function signOutAction(): Promise<void> {

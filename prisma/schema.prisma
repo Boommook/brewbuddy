@@ -107,11 +107,24 @@ model User {
   username     String   @unique
   passwordHash String
   displayName  String?
+  email        String   @unique
+  emailVerified Boolean @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   batches     Batch[]
   ingredients Ingredient[]
+  verificationTokens EmailVerificationToken[]
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  token     String   @unique
+  userId    String   @db.Uuid
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Ingredient {

@@ -9,6 +9,8 @@ import {
 } from "../lib/auth/constants";
 import { hashPassword, verifyPassword } from "../lib/auth/password";
 import { clearSession, getUserId, setSessionUserId } from "./auth";
+import { createVerificationToken } from "../lib/auth/verification";
+import { sendVerificationEmail } from "../lib/email";
 
 export type PublicAuthUser = {
   id: string;
@@ -29,6 +31,13 @@ export {
 
 // letters, digits, underscore, hyphen only.
 const USERNAME_PATTERN = /^[a-zA-Z0-9_-]+$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateEmail(email: string): string | null {
+  if (!email) return "Email is required.";
+  if (!EMAIL_PATTERN.test(email)) return "Please enter a valid email address.";
+  return null;
+}
 
 function validateUsername(username: string): string | null {
   if (username.length < AUTH_USERNAME_MIN) {
@@ -97,9 +106,7 @@ export async function signInWithCredentials(
     };
   }
   // check db for user
-  const user = await prisma.user.findUnique({
-    where: { username },
-  });
+  const user = await prisma.user.findUnique({ where: { username } });
 
   // error handling
   if (!user || !verifyPassword(password, user.passwordHash)) {
@@ -109,7 +116,15 @@ export async function signInWithCredentials(
       status: 401,
     };
   }
-
+/*
+  if (!user.emailVerified) {
+    return {
+      ok: false,
+      error: "Please verify your email before logging in. Check your inbox.",
+      status: 403,
+    };
+  }
+*/
   // set session cookie and return user
   await setSessionUserId(user.id);
   return { ok: true, user: toPublicAuthUser(user) };
@@ -118,6 +133,7 @@ export async function signInWithCredentials(
 export type SignUpFields = {
   username: string;
   password: string;
+  email: string;
   // when provided and non-empty, must equal `password`.
   confirmPassword?: string;
   displayName?: string | null;
@@ -130,6 +146,7 @@ export async function signUpWithCredentials(
 ): Promise<AuthResult> {
   const username = fields.username.trim();
   const password = fields.password;
+  const email = fields.email.trim().toLowerCase();
   const displayName =
     fields.displayName && fields.displayName.trim().length > 0
       ? fields.displayName.trim()
@@ -140,6 +157,9 @@ export async function signUpWithCredentials(
 
   const pErr = validatePassword(password);
   if (pErr) return { ok: false, error: pErr, status: 400 };
+
+  const eErr = validateEmail(email);
+  if (eErr) return { ok: false, error: eErr, status: 400 };
 
   if (
     fields.confirmPassword !== undefined &&
@@ -157,17 +177,26 @@ export async function signUpWithCredentials(
         username,
         passwordHash,
         displayName,
+        email,
       },
     });
 
-    await setSessionUserId(user.id);
+    const token = await createVerificationToken(user.id);
+    await sendVerificationEmail(email, token);
+
+    // no session yet
     return { ok: true, user: toPublicAuthUser(user) };
   } catch {
-    return {
-      ok: false,
-      error: "That username is already taken.",
-      status: 409,
-    };
+      // distinguish between duplicate username vs duplicate email
+      const existing = await prisma.user.findFirst({
+        where: { OR: [{ username }, { email }] },
+        select: { username: true, email: true },
+      });
+      if (existing?.email === email) {
+        return { ok: false, error: "That email is already registered.", status: 409 };
+      }
+      return { ok: false, error: "That username is already taken.", status: 409 };
+
   }
 }
 

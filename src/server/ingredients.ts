@@ -45,7 +45,7 @@ export async function getIngredientsForUserCatalog(): Promise<IngredientDTO[]> {
   const rows = await prisma.ingredient.findMany({
     where: {
       isArchived: false,
-      OR: [{ isGlobal: true }, { userId }],
+      isGlobal: true,
     },
     // order the ingredients by type and name
     orderBy: [{ ingredientType: "asc" }, { name: "asc" }],

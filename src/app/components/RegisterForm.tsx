@@ -42,6 +42,20 @@ export function RegisterForm() {
       </div>
 
       <div className="flex flex-col gap-1">
+        <label htmlFor="register-email" className="text-sm font-medium text-gray-800">
+          Email
+        </label>
+        <input
+          id="register-email"
+          name="email"
+          required
+          type="email"
+          autoComplete="email"
+          className="auth-input-style"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
         <label htmlFor="register-display" className="text-sm font-medium text-gray-800">
           Display name <span className="font-normal text-gray-500">(optional)</span>
         </label>

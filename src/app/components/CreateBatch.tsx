@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, PlusIcon } from "lucide-react";
 import { Button } from "@/src/app/components/ui/button";
 import type { IngredientDTO } from "@/src/types/ingredient";
 import { Input } from "@/src/app/components/ui/input";
@@ -55,6 +55,8 @@ export default function CreateBatch() {
 
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  const [creationMethod, setCreationMethod] = useState<"manual" | "recipe">("manual");
 
   // state for the cover image. this is the file object of the cover image (used to send the file to the server)
   const [coverImage, setCoverImage] = useState<File | null>(null);
@@ -298,12 +300,25 @@ const removeRow = (id: string) =>
   return (
     <div className="my-8 mx-[20vw] rounded-xl border-2 border-harvest-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs">
       <div >
-        <div className="mb-6 flex items-center gap-4">
-          <BackButton />
-          <div>
+        <div className="mb-6 flex gap-4">
+          <div className="flex mt-2">
+            <BackButton  />
+          </div>
+          <div className="flex flex-col gap-2">
             <h1 className="zilla-slab-bold text-3xl text-gray-900">
               New batch
             </h1>
+            <p>
+              Select a method to create your batch:
+            </p>
+            <div className="flex flex-row gap-2">
+              <Button variant="outline" className={`${creationMethod === "manual" ? "option-button-active" : "option-button"}`} onClick={() => setCreationMethod("manual")}>
+                Manual
+              </Button>
+              <Button variant="outline" className={`${creationMethod === "recipe" ? "option-button-active" : "option-button"}`} onClick={() => setCreationMethod("recipe")}>
+                Import from Recipe
+              </Button>
+            </div>
             <p className="nunito-sans-regular text-gray-700">
               Log the basics now; you can add fermentation events and readings later.
             </p>

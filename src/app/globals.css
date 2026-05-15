@@ -340,6 +340,14 @@ body {
   @apply  shadow-md shadow-black/20 hover:scale-105 hover:cursor-pointer border-none size-8 rounded-full bg-bright-blue hover:bg-bright-blue-700 text-antique-white;
 }
 
+.option-button {
+  @apply bg-harvest-orange-300/50 border-2 border-harvest-orange-800 text-antique-white-900 shadow-md shadow-black/20 hover:bg-harvest-orange-500/50 hover:cursor-pointer;
+}
+
+.option-button-active {
+  @apply bg-harvest-orange-500/50 scale-105 hover:cursor-default border-2 border-harvest-orange-800 text-antique-white-900 shadow-md shadow-black/20;
+}
+
 .table-wrap {
   @apply overflow-x-auto rounded-lg border-2 border-harvest-orange-700 ;
 }
