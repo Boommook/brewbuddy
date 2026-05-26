@@ -21,7 +21,11 @@ export default async function BatchLogPage({
 
   return (
     <div className="w-full flex justify-center items-center">
-      <LogBatchActivity batchId={batch.id} batchName={batch.name} />
+      <LogBatchActivity
+        batchId={batch.id}
+        batchName={batch.name}
+        batchCurrentStage={batch.currentStage}
+      />
     </div>
   );
 }

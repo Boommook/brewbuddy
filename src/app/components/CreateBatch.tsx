@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, PlusIcon } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/src/app/components/ui/button";
 import type { IngredientDTO } from "@/src/types/ingredient";
 import { Input } from "@/src/app/components/ui/input";
@@ -11,26 +11,43 @@ import BackButton from "./buttons/BackButton";
 import { groupIngredientsByType } from "@/src/lib/ingredientCatalog";
 import IngredientLinesSection from "./IngredientLinesSection";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import {
+  type IngredientLineRow,
+  ingredientLineInputsFromRows,
+  ingredientLineRowFromDTO,
+  newIngredientLineRow,
+} from "@/src/types/ingredientLines";
+import RecipeSelect from "./RecipeSelect";
+import type { RecipeDTO } from "@/src/types/recipe";
+
+export type AdditionRow = IngredientLineRow;
+
 const CUSTOM_VALUE = "__custom__";
 
-export type AdditionRow = {
-  id: string;
-  selectValue: string;
-  customName: string;
-  amount: string;
-  unit: string;
-  notes: string;
-};
+function mergeRecipeIngredientsIntoCatalog(
+  catalog: IngredientDTO[],
+  recipeIngredients: RecipeDTO["ingredients"]
+) {
+  const merged = new Map(
+    catalog.map((ingredient) => [ingredient.id, ingredient])
+  );
 
-function newRow(): AdditionRow {
-  return {
-    id: crypto.randomUUID(),
-    selectValue: "",
-    customName: "",
-    amount: "",
-    unit: "",
-    notes: "",
-  };
+  for (const recipeIngredient of recipeIngredients) {
+    if (recipeIngredient.ingredient) {
+      merged.set(recipeIngredient.ingredient.id, recipeIngredient.ingredient);
+    }
+  }
+
+  return Array.from(merged.values());
+}
+
+function mergeIngredientCatalogs(
+  primary: IngredientDTO[],
+  secondary: IngredientDTO[]
+) {
+  return Array.from(
+    new Map([...primary, ...secondary].map((ingredient) => [ingredient.id, ingredient])).values()
+  );
 }
 
 export default function CreateBatch() {
@@ -57,9 +74,7 @@ export default function CreateBatch() {
   const [formError, setFormError] = useState<string | null>(null);
 
   const [creationMethod, setCreationMethod] = useState<"manual" | "recipe">("manual");
-
-  // state for the cover image. this is the file object of the cover image (used to send the file to the server)
-  const [coverImage, setCoverImage] = useState<File | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<RecipeDTO | null>(null);
   // state for the cover image url. this is the url of the cover image (used to actually display the cover image)
   // the image is actually stored in the vercel blob storage
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
@@ -79,15 +94,9 @@ export default function CreateBatch() {
     // check if file is null, if so...
     if (!file) {
       // set the cover image to null and the cover image url to null and return
-      setCoverImage(null);
       setCoverImageUrl(null);
       return;
     }
-
-    //otherwise...
-
-    // set the cover image to the file
-    setCoverImage(file);
 
     // create a new form data object to send the file to the server
     const formData = new FormData(); // docs: https://developer.mozilla.org/en-US/docs/Web/API/FormData
@@ -122,9 +131,20 @@ export default function CreateBatch() {
           ? error.message
           : "Failed to upload cover image"
       );
-      setCoverImage(null);
       setCoverImageUrl(null);
     }
+  };
+
+  const handleRecipeSelect = (recipe: RecipeDTO) => {
+    setSelectedRecipe(recipe);
+    setCategory(recipe.category ?? "MEAD");
+    setMeadSubtype(recipe.category === "MEAD" ? recipe.meadSubtype ?? null : null);
+    setTargetVolume(String(recipe.targetVolume));
+    setRows(recipe.ingredients.map(ingredientLineRowFromDTO));
+    setIngredients((current) =>
+      mergeRecipeIngredientsIntoCatalog(current, recipe.ingredients)
+    );
+    setSort("oldest");
   };
 
  
@@ -151,13 +171,13 @@ export default function CreateBatch() {
         // ensure the data is ok and is an array
         if (!cancelled && data.ok && Array.isArray(data.ingredients)) {
             // set the ingredients state to the ingredient catalog
-            setIngredients(data.ingredients);
+            setIngredients((current) => mergeIngredientCatalogs(data.ingredients, current));
         }
-    } catch (e) {
+    } catch (error) {
         if (!cancelled) {
-            /*setCatalogError(
-                e instanceof Error ? e.message : "Could not load ingredients"
-            );*/
+            setCatalogError(
+                error instanceof Error ? error.message : "Could not load ingredients"
+            );
         }
     }
     })();
@@ -177,7 +197,7 @@ const onSelectIngredient = useCallback((rowId: string, value: string) => {
             return {
                 ...r,
                 selectValue: CUSTOM_VALUE,
-                customName: "",
+                customName: r.customName ?? "",
                 unit: r.unit,
             };
         }
@@ -195,9 +215,9 @@ const onSelectIngredient = useCallback((rowId: string, value: string) => {
     );
 }, [ingredients]);
 
-const addRow = () => setRows((r) => [...r, newRow()]);
-const removeRow = (id: string) =>
-    setRows((r) => r.filter((x) => x.id !== id));
+  const addRow = () => setRows((r) => [...r, newIngredientLineRow("PRIMARY")]);
+  const removeRow = (id: string) =>
+      setRows((r) => r.filter((x) => x.id !== id));
 
   const groupedCatalog = useMemo(
     () => groupIngredientsByType(ingredients),
@@ -220,36 +240,16 @@ const removeRow = (id: string) =>
       return;
     }
 
-    // create an array to store the additions
-    const additions: {
-      ingredientId: string | null;
-      customIngredientName: string | null;
-      amount: number;
-      unit: string;
-      notes: string | null;
-    }[] = [];
-
-    for (const row of rows) {
-      const isCustom = row.selectValue === CUSTOM_VALUE;
-      const catalogId =
-        !isCustom && row.selectValue ? row.selectValue : null;
-      const customIngredientName = isCustom ? row.customName.trim() : "";
-      if (!catalogId && !customIngredientName) continue;
-      const amount = Number(row.amount);
-      const unit = row.unit.trim();
-      if (!Number.isFinite(amount) || amount <= 0 || !unit) {
-        setFormError(
-          "Each ingredient line needs a positive amount and a unit."
-        );
-        return;
-      }
-      additions.push({
-        ingredientId: catalogId,
-        customIngredientName: isCustom ? customIngredientName : null,
-        amount,
-        unit,
-        notes: row.notes.trim() || null,
-      });
+    let additions;
+    try {
+      additions = ingredientLineInputsFromRows(rows);
+    } catch (error) {
+      setFormError(
+        error instanceof Error
+          ? error.message
+          : "Each ingredient line needs a positive amount and a unit."
+      );
+      return;
     }
 
     const payload: Record<string, unknown> = {
@@ -325,6 +325,9 @@ const removeRow = (id: string) =>
           </div>
         </div>
 
+        {creationMethod === "recipe" && (
+          <RecipeSelect setSelectedRecipe={handleRecipeSelect} selectedRecipe={selectedRecipe} />
+        )}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {catalogError && (
             <p className="rounded-md border border-amber-700/50 bg-amber-100/80 px-3 py-2 text-sm text-amber-950">
@@ -355,6 +358,7 @@ const removeRow = (id: string) =>
               <span className="text-sm font-semibold text-gray-800">
                 Category
               </span>
+              {creationMethod === "manual" ? (  
               <select
                 className="auth-input-style w-full"
                 value={category}
@@ -366,13 +370,17 @@ const removeRow = (id: string) =>
                   </option>
                 ))}
               </select>
+              ) : (
+                <div className="auto-field-fill-style w-full">{selectedRecipe?.category}</div>
+              )}
             </label>
 
-            {category === "MEAD" ? (
+            {category === "MEAD" && selectedRecipe?.meadSubtype ? (
               <label className="flex flex-col gap-1">
                 <span className="text-sm font-semibold text-gray-800">
                   Mead subtype <span className="font-normal text-gray-600">(optional)</span>
                 </span>
+                {creationMethod === "manual" ? (
                 <select
                   className="auth-input-style w-full"
                   value={meadSubtype ?? ""}
@@ -385,6 +393,9 @@ const removeRow = (id: string) =>
                     </option>
                   ))}
                 </select>
+                ) : (
+                    <div className="auto-field-fill-style w-full">{selectedRecipe?.meadSubtype}</div>
+                )}
               </label>
             ) : <div className="col-span-1"></div>}
 
@@ -416,13 +427,17 @@ const removeRow = (id: string) =>
               <span className="text-sm font-semibold text-gray-800">
                 Target volume (gallons) <span className="font-normal text-gray-600">(optional)</span>
               </span>
-              <input
-                className="auth-input-style w-full"
-                inputMode="decimal"
-                value={targetVolume}
-                onChange={(e) => setTargetVolume(e.target.value)}
-                placeholder="e.g. 3"
-              />
+              {creationMethod === "manual" ? (
+                <input
+                  className="auth-input-style w-full"
+                  inputMode="decimal"
+                  value={targetVolume}
+                  onChange={(e) => setTargetVolume(e.target.value)}
+                  placeholder="e.g. 3"
+                />
+              ) : (
+                <div className="auto-field-fill-style w-full">{selectedRecipe?.targetVolume} gallons</div>
+              )}
             </label>
 
             <label className="flex flex-col gap-1">

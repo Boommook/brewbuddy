@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { getSessionUser } from "@/src/server/auth-credentials";
 import { signOutAction } from "../actions/auth";
-import { LogOut, CirclePlus } from "lucide-react";
+import { LogOut, CirclePlus, FilePlusCorner } from "lucide-react";
 import { DashboardFunnelButton } from "./DashboardFunnelButton";
 import { Button } from "./ui/button";
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
+import CreateRecipe from "@/public/createrecipe.svg";
+import CreateBatch from "@/public/createbatch.svg";
+import Image from "next/image";
 
 export default async function Navbar() {
   const user = await getSessionUser();
@@ -33,11 +36,24 @@ export default async function Navbar() {
               </Link>
             </>
           )}
+          {user && <Tooltip>
+            <TooltipTrigger>
+              <Link href="/createrecipe" className=" rounded-full">
+              <div className="size-10 rounded-full  p-1">
+                <Image src={CreateRecipe} alt="Create Recipe" className="size-full navbar-buttons brightness-0 invert" />
+              </div>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>Create a new recipe</p>
+            </TooltipContent>
+          </Tooltip>}
           <Tooltip>
             <TooltipTrigger>
               <Link href="/createbatch" className="navbar-buttons rounded-full">
-                <CirclePlus className="size-10 rounded-full p-1" />
-              </Link>
+              <div className="size-10 rounded-full p-1">
+                <Image src={CreateBatch} alt="Create Batch" className="size-full navbar-buttons brightness-0 invert" />
+              </div>              </Link>
             </TooltipTrigger>
             <TooltipContent side="bottom">
               <p>Create a new batch</p>

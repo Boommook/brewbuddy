@@ -324,7 +324,7 @@ body {
 }
 
 .navbar-buttons {
-  @apply hover:scale-105 hover:cursor-pointer text-antique-white-100 hover:text-antique-white-200;
+  @apply hover:scale-110 hover:cursor-pointer text-antique-white-100 ;
 }
 
 .save-button {
@@ -346,6 +346,21 @@ body {
 
 .option-button-active {
   @apply bg-harvest-orange-500/50 scale-105 hover:cursor-default border-2 border-harvest-orange-800 text-antique-white-900 shadow-md shadow-black/20;
+}
+
+.recipe-select-button {
+  @apply bg-harvest-orange-300/25 border-2 border-harvest-orange-800 p-1 rounded-lg text-center items-center 
+  justify-center hover:cursor-pointer shadow-md shadow-black/20;
+}
+
+.recipe-select-button-active {
+  @apply bg-harvest-orange-500/25 scale-105 hover:cursor-default border-2 border-harvest-orange-800 text-antique-white-900
+  justify-center shadow-md shadow-black/20;
+}
+
+.auto-field-fill-style {
+  @apply rounded-md border border-camel-400 px-3 py-2 bg-antique-white-100/75  text-gray-900 
+  focus:outline-none focus:ring-1 focus:ring-bright-blue inset-shadow-md inset-shadow-black/25 hover:cursor-not-allowed;
 }
 
 .table-wrap {

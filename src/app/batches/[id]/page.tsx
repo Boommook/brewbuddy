@@ -15,6 +15,7 @@ import { Button } from "../../components/ui/button";
 import BatchName from "../../components/BatchName";
 import FavoriteButton from "../../components/buttons/FavoriteButton";
 import TrashButton from "../../components/buttons/TrashButton";
+import { formatBatchStage } from "@/src/lib/batchStages";
 
 // function to format the category label from the all caps value to the human readable label
 function formatCategoryLabel(category: BrewCategory): string {
@@ -183,6 +184,7 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
                 <tr className="text-header">
                   <th className="thcell">Name</th>
                   <th className="thcell">Type</th>
+                  <th className="thcell">Stage</th>
                   <th className={"thcell"}>Date added</th>
                   <th className={"thcell"}>Amount</th>
                   <th className={"thcell"}>Unit</th>
@@ -192,7 +194,7 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
               <tbody>
                 {batch.additions.length === 0 ? (
                   <tr>
-                    <td className={"tdcell"} colSpan={3}>
+                    <td className={"tdcell"} colSpan={7}>
                       No ingredients recorded.
                     </td>
                   </tr>
@@ -207,6 +209,7 @@ export default async function BatchPage({ params }: { params: Promise<{ id: stri
                       <tr key={a.id}>
                         <td className={"tdcell"}>{displayName}</td>
                         <td className={"tdcell"}>{typeLabel}</td>
+                        <td className={"tdcell"}>{formatBatchStage(a.stageAdded)}</td>
                         <td className={"tdcell"}>{formatDate(when)}</td>
                         <td className={"tdcell"}>{a.amount?.toString() ?? "—"}</td>
                         <td className={"tdcell"}>{a.unit ?? "—"}</td>

@@ -16,6 +16,12 @@ export type {
 } from "./ingredient";
 
 export type {
+  IngredientReference,
+  IngredientLineInput,
+  IngredientLineDTO,
+} from "./ingredientLine";
+
+export type {
   BatchIngredientAdditionDTO,
   CreateBatchIngredientAdditionInput,
   UpdateBatchIngredientAdditionInput,

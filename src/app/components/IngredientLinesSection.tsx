@@ -5,7 +5,9 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/src/app/components/ui/button";
 import type { IngredientDTO } from "@/src/types/ingredient";
 import type { IngredientTypeGroup } from "@/src/lib/ingredientCatalog";
-import type { AdditionRow } from "./CreateBatch";
+import type { IngredientLineRow } from "@/src/types/ingredientLines";
+import type { BatchStage } from "@/src/generated/prisma/index.js";
+import { BATCH_STAGE_OPTIONS } from "@/src/lib/batchStages";
 import IngredientAddition from "./IngredientAddition";
 import SortToggle from "./buttons/SortToggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -16,11 +18,11 @@ export type IngredientLinesSectionProps = {
   title: string;
   description: ReactNode;
   emptyMessage: ReactNode;
-  rows: AdditionRow[];
+  rows: IngredientLineRow[];
   ingredients: IngredientDTO[];
   groupedCatalog: IngredientTypeGroup[];
   onSelectIngredient: (rowId: string, value: string) => void;
-  setRows: Dispatch<SetStateAction<AdditionRow[]>>;
+  setRows: Dispatch<SetStateAction<IngredientLineRow[]>>;
   onAddRow: () => void;
   onRemoveRow: (rowId: string) => void;
   sort?: "newest" | "oldest";
@@ -119,8 +121,35 @@ export default function IngredientLinesSection({
                   />
                 </label>
               ) : null}
-              <div className="mt-2 flex w-full gap-4">
-                <label className="flex flex-col gap-1">
+              <div className="mt-2 flex w-full flex-wrap gap-4">
+                <label className="flex min-w-[10rem] flex-1 flex-col gap-1">
+                  <span className="text-sm font-semibold text-gray-700">
+                    Stage added
+                  </span>
+                  <select
+                    className="auth-input-style w-full text-sm"
+                    value={row.stageAdded}
+                    onChange={(e) =>
+                      setRows((prev) =>
+                        prev.map((r) =>
+                          r.id === row.id
+                            ? {
+                                ...r,
+                                stageAdded: e.target.value as BatchStage,
+                              }
+                            : r
+                        )
+                      )
+                    }
+                  >
+                    {BATCH_STAGE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex flex-1 flex-col gap-1">
                   <Tooltip>
                     <TooltipTrigger>
                       <span className="text-sm font-semibold text-gray-700 text-left flex">
@@ -146,7 +175,7 @@ export default function IngredientLinesSection({
                     }
                   />
                 </label>
-                <label className="flex flex-col gap-1">
+                <label className="flex flex-1 flex-col gap-1">
                   <span className="text-sm font-semibold text-gray-700">
                     Unit
                   </span>

@@ -16,42 +16,17 @@ import {
 import BackButton from "./buttons/BackButton";
 import { groupIngredientsByType } from "@/src/lib/ingredientCatalog";
 import IngredientLinesSection from "./IngredientLinesSection";
+import { BATCH_STAGE_OPTIONS } from "@/src/lib/batchStages";
+import type { BatchStage } from "@/src/generated/prisma/index.js";
+import {
+  type IngredientLineRow,
+  ingredientLineInputsFromRows,
+  newIngredientLineRow,
+} from "@/src/types/ingredientLines";
 
 const STAGE_REQUIRED_EVENTS = new Set<string>(["STABILIZED", "TRANSFERRED"]);
 
-const BATCH_STAGE_OPTIONS: { value: string; label: string }[] = [
-  { value: "PLANNING", label: "Planning" },
-  { value: "PRIMARY", label: "Primary fermentation" },
-  { value: "SECONDARY", label: "Secondary fermentation" },
-  { value: "BULK_AGING", label: "Bulk aging" },
-  { value: "STABILIZING", label: "Stabilizing" },
-  { value: "BACKSWEETENING", label: "Backsweetening" },
-  { value: "PACKAGING", label: "Packaging" },
-  { value: "CONDITIONING", label: "Conditioning" },
-  { value: "DONE", label: "Done" },
-];
-
 const CUSTOM_VALUE = "__custom__";
-
-type AdditionRow = {
-  id: string;
-  selectValue: string;
-  customName: string;
-  amount: string;
-  unit: string;
-  notes: string;
-};
-
-function newRow(): AdditionRow {
-  return {
-    id: crypto.randomUUID(),
-    selectValue: "",
-    customName: "",
-    amount: "",
-    unit: "",
-    notes: "",
-  };
-}
 
 function toDatetimeLocalValue(d: Date) {
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -61,9 +36,14 @@ function toDatetimeLocalValue(d: Date) {
 type Props = {
   batchId: string;
   batchName: string;
+  batchCurrentStage: BatchStage;
 };
 
-export default function LogBatchActivity({ batchId, batchName }: Props) {
+export default function LogBatchActivity({
+  batchId,
+  batchName,
+  batchCurrentStage,
+}: Props) {
   const router = useRouter();
   const [ingredients, setIngredients] = useState<IngredientDTO[]>([]);
   const [catalogError, setCatalogError] = useState<string | null>(null);
@@ -77,7 +57,7 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
   const [occurredAtLocal, setOccurredAtLocal] = useState(() =>
     toDatetimeLocalValue(new Date())
   );
-  const [rows, setRows] = useState<AdditionRow[]>([]);
+  const [rows, setRows] = useState<IngredientLineRow[]>([]);
 
   const [newStage, setNewStage] = useState<string>("");
 
@@ -176,47 +156,11 @@ export default function LogBatchActivity({ batchId, batchName }: Props) {
     [ingredients]
   );
 
-  const addRow = () => setRows((r) => [...r, newRow()]);
+  const addRow = () =>
+    setRows((r) => [...r, newIngredientLineRow(batchCurrentStage)]);
   const removeRow = (id: string) => setRows((r) => r.filter((x) => x.id !== id));
 
-  const buildAdditionsPayload = (): {
-    ingredientId: string | null;
-    customIngredientName: string | null;
-    amount: number;
-    unit: string;
-    notes: string | null;
-  }[] => {
-    const additions: {
-      ingredientId: string | null;
-      customIngredientName: string | null;
-      amount: number;
-      unit: string;
-      notes: string | null;
-    }[] = [];
-
-    for (const row of rows) {
-      const isCustom = row.selectValue === CUSTOM_VALUE;
-      const catalogId =
-        !isCustom && row.selectValue ? row.selectValue : null;
-      const customIngredientName = isCustom ? row.customName.trim() : "";
-      if (!catalogId && !customIngredientName) continue;
-      const amount = Number(row.amount);
-      const unitStr = row.unit.trim();
-      if (!Number.isFinite(amount) || amount <= 0 || !unitStr) {
-        throw new Error(
-          "Each ingredient line needs a positive amount and a unit."
-        );
-      }
-      additions.push({
-        ingredientId: catalogId,
-        customIngredientName: isCustom ? customIngredientName : null,
-        amount,
-        unit: unitStr,
-        notes: row.notes.trim() || null,
-      });
-    }
-    return additions;
-  };
+  const buildAdditionsPayload = () => ingredientLineInputsFromRows(rows);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

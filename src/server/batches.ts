@@ -7,8 +7,10 @@ import {
   BatchStage,
   BrewCategory,
   EventType,
+  type MeadSubtype,
 } from "../generated/prisma/index.js";
 import type { CreateBatchAdditionPayload, CreateBatchInput } from "../types/batch";
+import { normalizeIngredientLineInputs } from "../lib/ingredientLine";
 import { toBatchDTO } from "../lib/utils/batch";
 import { calculateABVNumber } from "../lib/utils/helpers";
 import { redirect } from "next/navigation";
@@ -80,7 +82,12 @@ export async function getBatchSummaryForUser(batchId: string) {
 
   return prisma.batch.findFirst({
     where: { id: batchId, userId },
-    select: { id: true, name: true, thumbnailImageUrl: true },
+    select: {
+      id: true,
+      name: true,
+      thumbnailImageUrl: true,
+      currentStage: true,
+    },
   });
 }
 
@@ -156,7 +163,7 @@ export async function getBatchPageData(batchId: string) {
   if (!batch) return null;
 
   const oG = batch.originalGravity;
-  let abvRows: { id: string; measuredAt: Date; specificGravity: number; abv: number }[] =
+  const abvRows: { id: string; measuredAt: Date; specificGravity: number; abv: number }[] =
     [];
 
   if (oG) {
@@ -306,7 +313,9 @@ export async function createNewBatch(input: CreateBatchInput) {
     throw new Error("Invalid brewDate");
   }
 
-  const additions = normalizeAdditions(input.additions);
+  // if the current stage is not provided, use the primary stage
+  const batchStage = input.currentStage ?? BatchStage.PRIMARY;
+  const additions = normalizeAdditions(input.additions, batchStage);
 
   const batch = await prisma.$transaction(async (tx) => {
     for (const a of additions) {
@@ -324,29 +333,25 @@ export async function createNewBatch(input: CreateBatchInput) {
       }
     }
 
-    // build data object separately so we can keep type narrowing clear.
-    const data: any = {
-      userId,
-      name: input.name,
-      category: input.category,
-      status: input.status ?? BatchStatus.ACTIVE,
-      currentStage: input.currentStage ?? BatchStage.PRIMARY,
-      startDate,
-      lastLoggedAt: startDate,
-      brewDate,
-      notes: input.notes ?? undefined,
-      targetVolume: input.targetVolume ?? undefined,
-      actualVolume: input.actualVolume ?? undefined,
-      originalGravity: input.originalGravity ?? undefined,
-      thumbnailImageUrl: input.thumbnailImageUrl ?? undefined,
-    };
-
-    if (input.category === BrewCategory.MEAD && input.meadSubtype) {
-      data.meadSubtype = input.meadSubtype;
-    }
-
     const created = await tx.batch.create({
-      data,
+      data: {
+        userId,
+        name: input.name,
+        category: input.category,
+        status: input.status ?? BatchStatus.ACTIVE,
+        currentStage: batchStage,
+        startDate,
+        lastLoggedAt: startDate,
+        brewDate,
+        notes: input.notes ?? undefined,
+        targetVolume: input.targetVolume ?? undefined,
+        actualVolume: input.actualVolume ?? undefined,
+        originalGravity: input.originalGravity ?? undefined,
+        thumbnailImageUrl: input.thumbnailImageUrl ?? undefined,
+        ...(input.category === BrewCategory.MEAD && input.meadSubtype
+          ? { meadSubtype: input.meadSubtype as MeadSubtype }
+          : {}),
+      },
     });
 
     await tx.batchEvent.create({
@@ -368,6 +373,7 @@ export async function createNewBatch(input: CreateBatchInput) {
           amount: a.amount,
           unit: a.unit,
           purpose: a.purpose ?? null,
+          stageAdded: a.stageAdded ?? batchStage,
           notes: a.notes ?? null,
           addedAt: startDate,
         })),
@@ -381,45 +387,28 @@ export async function createNewBatch(input: CreateBatchInput) {
 }
 
 export function normalizeAdditions(
-  raw: CreateBatchAdditionPayload[] | undefined
+  raw: CreateBatchAdditionPayload[] | undefined,
+  defaultStage: BatchStage = BatchStage.PRIMARY
 ): CreateBatchAdditionPayload[] {
   if (!raw?.length) return [];
 
   const out: CreateBatchAdditionPayload[] = [];
-  for (const a of raw) {
-    const unit = typeof a.unit === "string" ? a.unit.trim() : "";
-    const custom =
-      typeof a.customIngredientName === "string"
-        ? a.customIngredientName.trim()
-        : "";
-    const hasIngredient =
-      typeof a.ingredientId === "string" && a.ingredientId.length > 0;
-    const amount = Number(a.amount);
 
-    if (!hasIngredient && !custom) continue;
-    if (!Number.isFinite(amount) || amount <= 0) {
-      throw new Error("Each ingredient line needs a positive amount");
-    }
-    if (!unit) {
-      throw new Error("Each ingredient line needs a unit");
-    }
-    if (hasIngredient && custom) {
-      throw new Error("Use either a catalog ingredient or a custom name, not both");
+  for (const addition of raw) {
+    const [line] = normalizeIngredientLineInputs([addition], defaultStage);
+    if (!line) {
+      continue;
     }
 
     out.push({
-      ingredientId: hasIngredient ? a.ingredientId! : null,
-      customIngredientName: custom || null,
-      amount,
-      unit,
+      ...line,
       purpose:
-        typeof a.purpose === "string" && a.purpose.trim()
-          ? a.purpose.trim()
+        typeof addition.purpose === "string" && addition.purpose.trim()
+          ? addition.purpose.trim()
           : null,
-      notes:
-        typeof a.notes === "string" && a.notes.trim() ? a.notes.trim() : null,
     });
   }
+
   return out;
 }
 

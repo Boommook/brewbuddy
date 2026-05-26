@@ -1,34 +1,23 @@
 import type {
+  BatchStage,
   EventType,
   MeasurementType,
 } from "../generated/prisma/index.js";
+import type { IngredientLineDTO, IngredientLineInput } from "./ingredientLine";
 
 // addition line on a batch (json api shape).
-export type BatchIngredientAdditionDTO = {
-  id: string;
+export type BatchIngredientAdditionDTO = IngredientLineDTO & {
   batchId: string;
-  ingredientId: string | null;
-  customIngredientName: string | null;
-  amount: string;
-  unit: string;
   purpose: string | null;
   additionType: string | null;
   addedAt: string | null;
-  notes: string | null;
-  createdAt: string;
-  updatedAt: string;
 };
 
-export type CreateBatchIngredientAdditionInput = {
+export type CreateBatchIngredientAdditionInput = IngredientLineInput & {
   batchId: string;
-  ingredientId?: string | null;
-  customIngredientName?: string | null;
-  amount: number;
-  unit: string;
   purpose?: string | null;
   additionType?: string | null;
   addedAt?: string | null;
-  notes?: string | null;
 };
 
 export type UpdateBatchIngredientAdditionInput = {
@@ -39,6 +28,7 @@ export type UpdateBatchIngredientAdditionInput = {
   purpose?: string | null;
   additionType?: string | null;
   addedAt?: string | null;
+  stageAdded?: BatchStage;
   notes?: string | null;
 };
 

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import type { IngredientDTO } from "@/src/types/ingredient";
 import type { IngredientTypeGroup } from "@/src/lib/ingredientCatalog";
-import type { AdditionRow } from "./CreateBatch";
+import type { IngredientLineRow } from "@/src/types/ingredientLines";
 import {
   Popover,
   PopoverContent,
@@ -22,7 +22,7 @@ import { Separator } from "@/src/app/components/ui/separator";
 const CUSTOM_VALUE = "__custom__";
 
 type Props = {
-  row: AdditionRow;
+  row: IngredientLineRow;
   ingredients: IngredientDTO[];
   groupedCatalog: IngredientTypeGroup[];
   onSelectIngredient: (rowId: string, value: string) => void;

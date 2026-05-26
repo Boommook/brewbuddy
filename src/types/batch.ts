@@ -4,6 +4,7 @@ import type {
   BrewCategory,
   Prisma,
 } from "../generated/prisma/index.js";
+import type { IngredientLineInput } from "./ingredientLine";
 
 // json-serializable batch row; matches `toBatchDTO` in `lib/utils/batch.ts`.
 export type BatchDTO = {
@@ -37,13 +38,8 @@ export type BatchDTO = {
 };
 
 /** One ingredient line when creating a batch (no batchId; applied server-side). */
-export type CreateBatchAdditionPayload = {
-  ingredientId?: string | null;
-  customIngredientName?: string | null;
-  amount: number;
-  unit: string;
+export type CreateBatchAdditionPayload = IngredientLineInput & {
   purpose?: string | null;
-  notes?: string | null;
 };
 
 // type for creating a new batch

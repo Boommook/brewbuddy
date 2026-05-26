@@ -106,7 +106,8 @@ export async function createBatchEventLog(input: {
 
   const allowsIngredients =
     input.eventType === EventType.STABILIZED ||
-    input.eventType === EventType.BACKSWEETENED || EventType.INGREDIENT_ADDED;
+    input.eventType === EventType.BACKSWEETENED ||
+    input.eventType === EventType.INGREDIENT_ADDED;
 
   const rawAdds = input.additions;
   if (
@@ -115,17 +116,32 @@ export async function createBatchEventLog(input: {
     rawAdds.length > 0
   ) {
     throw new Error(
-      "Ingredients can only be logged with stabilization or backsweetening"
+      "Ingredients can only be logged with stabilization, backsweetening, or ingredient-added events"
     );
   }
 
-  const additions = allowsIngredients
-    ? normalizeAdditions(
-        Array.isArray(rawAdds) ? (rawAdds as CreateBatchAdditionPayload[]) : undefined
-      )
-    : [];
-
   const event = await prisma.$transaction(async (tx) => {
+    const ownedBatch = await tx.batch.findFirst({
+      where: { id: input.batchId, userId },
+      select: { currentStage: true },
+    });
+    if (!ownedBatch) {
+      const exists = await tx.batch.findFirst({
+        where: { id: input.batchId },
+        select: { id: true },
+      });
+      if (!exists) throw new Error("Batch not found");
+      throw new Error("Unauthorized");
+    }
+
+    const additions = allowsIngredients
+      ? normalizeAdditions(
+          Array.isArray(rawAdds)
+            ? (rawAdds as CreateBatchAdditionPayload[])
+            : undefined,
+          ownedBatch.currentStage
+        )
+      : [];
     for (const a of additions) {
       if (a.ingredientId) {
         const ing = await tx.ingredient.findFirst({
@@ -160,6 +176,7 @@ export async function createBatchEventLog(input: {
           amount: a.amount,
           unit: a.unit,
           purpose: a.purpose ?? null,
+          stageAdded: a.stageAdded ?? ownedBatch.currentStage,
           notes: a.notes ?? null,
           addedAt: input.occurredAt,
         })),
