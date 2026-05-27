@@ -22,7 +22,7 @@ export default function RecipeSelect({ setSelectedRecipe, selectedRecipe }: { se
         fetchRecipes();
     }, []);
     return (
-        <div className="rounded-lg border border-antique-white-600 bg-antique-white-200/40 p-4 ">
+        <div className="rounded-lg border border-antique-white-600 bg-antique-white-200/40 px-4 pt-2 pb-4 ">
             <h2 className="heading-style text-lg font-bold text-gray-900 mb-2">Select a recipe</h2>
             <div className="grid grid-cols-4 gap-8 rounded-md border border-antique-white-500 bg-antique-white-100/80 p-3 inset-shadow-md inset-shadow-black/25">
                 {recipes.map((recipe) => (

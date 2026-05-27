@@ -298,7 +298,7 @@ const onSelectIngredient = useCallback((rowId: string, value: string) => {
   };
 
   return (
-    <div className="my-8 mx-[20vw] rounded-xl border-2 border-harvest-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs">
+    <div className="md:my-8 md:mx-[20vw] md:rounded-xl md:border-2 border-harvest-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs">
       <div >
         <div className="mb-6 flex gap-4">
           <div className="flex mt-2">
@@ -306,7 +306,7 @@ const onSelectIngredient = useCallback((rowId: string, value: string) => {
           </div>
           <div className="flex flex-col gap-2">
             <h1 className="zilla-slab-bold text-3xl text-gray-900">
-              New batch
+              Create a batch
             </h1>
             <p>
               Select a method to create your batch:
