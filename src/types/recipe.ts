@@ -37,6 +37,8 @@ export type CreateRecipeInput = {
   ingredients: CreateRecipeIngredientInput[];
 };
 
+export type UpdateRecipeInput = CreateRecipeInput;
+
 export type CreateBatchFromRecipeInput = {
   recipeId: string;
   name: string;

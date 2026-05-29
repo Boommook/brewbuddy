@@ -37,7 +37,6 @@ function mergeRecipeIngredientsIntoCatalog(
       merged.set(recipeIngredient.ingredient.id, recipeIngredient.ingredient);
     }
   }
-
   return Array.from(merged.values());
 }
 
@@ -50,7 +49,11 @@ function mergeIngredientCatalogs(
   );
 }
 
-export default function CreateBatch() {
+type CreateBatchProps = {
+  initialRecipeId?: string;
+};
+
+export default function CreateBatch({ initialRecipeId }: CreateBatchProps = {}) {
   const router = useRouter();
   // state for the ingredients. this is an array of ingredient DTOs
   const [ingredients, setIngredients] = useState<IngredientDTO[]>([]);
@@ -73,8 +76,11 @@ export default function CreateBatch() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const [creationMethod, setCreationMethod] = useState<"manual" | "recipe">("manual");
+  const [creationMethod, setCreationMethod] = useState<"manual" | "recipe">(
+    initialRecipeId ? "recipe" : "manual"
+  );
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeDTO | null>(null);
+  const [importingRecipe, setImportingRecipe] = useState(false);
   // state for the cover image url. this is the url of the cover image (used to actually display the cover image)
   // the image is actually stored in the vercel blob storage
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
@@ -135,7 +141,7 @@ export default function CreateBatch() {
     }
   };
 
-  const handleRecipeSelect = (recipe: RecipeDTO) => {
+  const applyRecipeImport = useCallback((recipe: RecipeDTO) => {
     setSelectedRecipe(recipe);
     setCategory(recipe.category ?? "MEAD");
     setMeadSubtype(recipe.category === "MEAD" ? recipe.meadSubtype ?? null : null);
@@ -145,7 +151,67 @@ export default function CreateBatch() {
       mergeRecipeIngredientsIntoCatalog(current, recipe.ingredients)
     );
     setSort("oldest");
-  };
+
+    if (recipe.ingredients.length === 0) {
+      setFormError(
+        "This recipe has no saved ingredients yet. Add them on the recipe page, or enter ingredients manually below."
+      );
+    }
+  }, []);
+
+  const importRecipeById = useCallback(
+    async (recipeId: string) => {
+      setFormError(null);
+      setImportingRecipe(true);
+      try {
+        const res = await fetch(`/api/recipes/${recipeId}`);
+        const data = (await res.json()) as {
+          ok?: boolean;
+          recipe?: RecipeDTO;
+          error?: string;
+        };
+        if (!res.ok || !data.ok || !data.recipe) {
+          throw new Error(
+            typeof data.error === "string"
+              ? data.error
+              : "Could not load recipe ingredients"
+          );
+        }
+        applyRecipeImport(data.recipe);
+      } catch (error) {
+        setFormError(
+          error instanceof Error
+            ? error.message
+            : "Could not import recipe ingredients"
+        );
+      } finally {
+        setImportingRecipe(false);
+      }
+    },
+    [applyRecipeImport]
+  );
+
+  const handleRecipeSelect = useCallback(
+    async (recipe: RecipeDTO) => {
+      setSelectedRecipe(recipe);
+      await importRecipeById(recipe.id);
+    },
+    [importRecipeById]
+  );
+
+  useEffect(() => {
+    if (!initialRecipeId) return;
+    void importRecipeById(initialRecipeId);
+  }, [initialRecipeId, importRecipeById]);
+
+  useEffect(() => {
+    if (creationMethod !== "recipe" || !selectedRecipe?.ingredients.length) {
+      return;
+    }
+    setIngredients((current) =>
+      mergeRecipeIngredientsIntoCatalog(current, selectedRecipe.ingredients)
+    );
+  }, [creationMethod, ingredients.length, selectedRecipe]);
 
  
 /*
@@ -326,7 +392,11 @@ const onSelectIngredient = useCallback((rowId: string, value: string) => {
         </div>
 
         {creationMethod === "recipe" && (
-          <RecipeSelect setSelectedRecipe={handleRecipeSelect} selectedRecipe={selectedRecipe} />
+          <RecipeSelect
+            setSelectedRecipe={handleRecipeSelect}
+            selectedRecipe={selectedRecipe}
+            importing={importingRecipe}
+          />
         )}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {catalogError && (

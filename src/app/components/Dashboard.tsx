@@ -66,7 +66,7 @@ export default function Dashboard({ batches }: { batches: BatchDTO[] }) {
 
   return (
     <div className="my-8 mx-auto flex">
-        {batches.length > 0 ? <div className="w-full justify-center items-center grid grid-cols-3 gap-12">
+        {batches.length > 0 ? <div className="w-full justify-center items-center grid md:grid-cols-3 gap-12">
             {sortedBatches.map((batch) => (
                 // For mead batches, prefer the mead subtype label as the type.
                 // For all others, show the category enum value.

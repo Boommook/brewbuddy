@@ -248,7 +248,7 @@ export default function LogBatchActivity({
   };
 
   return (
-    <div className="my-8 mx-[20vw] w-full rounded-xl border-2 border-golden-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs nunito-sans-regular">
+    <div className="md:my-8 md:mx-[20vw] w-full h-full md:rounded-xl md:border-2 border-golden-orange-700 bg-camel/75 px-8 py-6 shadow-lg shadow-black/20 backdrop-blur-xs nunito-sans-regular">
       <div className="mb-6 flex items-center gap-4">
         <BackButton />
         <div>

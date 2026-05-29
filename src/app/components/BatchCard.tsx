@@ -50,7 +50,7 @@ export default function BatchCard({
       : "bg-red-600/60";
 
   return (
-    <div className="hover:cursor-pointer w-[30vw] shadow-lg shadow-black/30 rounded-xl">
+    <div className="hover:cursor-pointer md:w-[30vw] w-[90vw] shadow-lg shadow-black/30 rounded-xl">
       <Tooltip>
         <TooltipTrigger
           className="block w-full cursor-default text-left"

@@ -1,11 +1,11 @@
-import { redirect } from "next/navigation"
-import { getUserId } from "@/src/server/auth"
-import CreateRecipe from "../components/CreateRecipe"
+import { redirect } from "next/navigation";
+import { getUserId } from "@/src/server/auth";
+import RecipeForm from "../components/RecipeForm";
 
 export default async function CreateRecipePage() {
-  const userId = await getUserId()
+  const userId = await getUserId();
   if (!userId) {
-    redirect("/login")
+    redirect("/login");
   }
-  return <CreateRecipe />
+  return <RecipeForm mode="create" />;
 }

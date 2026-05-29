@@ -10,6 +10,7 @@ import type {
   CreateRecipeIngredientInput,
   RecipeDTO,
   RecipeIngredientDTO,
+  UpdateRecipeInput,
 } from "../types/recipe";
 
 type RecipeWithIngredients = Recipe & {
@@ -174,4 +175,87 @@ export async function createRecipe(input: CreateRecipeInput) {
         },
     });
     return toRecipeDTO(recipe);
+}
+
+async function requireOwnedRecipe(recipeId: string, userId: string) {
+    const recipe = await prisma.recipe.findFirst({
+        where: {
+            id: recipeId,
+            userId,
+            isArchived: false,
+        },
+    });
+
+    if (!recipe) {
+        throw new Error("Recipe not found or not editable");
+    }
+
+    return recipe;
+}
+
+export async function updateRecipe(recipeId: string, input: UpdateRecipeInput) {
+    const userId = await getUserId();
+    if (!userId) {
+        redirect("/login");
+        return;
+    }
+
+    await requireOwnedRecipe(recipeId, userId);
+    const ingredients = normalizeIngredients(input.ingredients);
+
+    const recipe = await prisma.$transaction(async (tx) => {
+        await tx.recipeIngredient.deleteMany({
+            where: { recipeId },
+        });
+
+        return tx.recipe.update({
+            where: { id: recipeId },
+            data: {
+                name: input.name,
+                description: input.description,
+                targetVolume: input.targetVolume,
+                targetVolumeUnit: input.targetVolumeUnit,
+                category: input.category,
+                meadSubtype: input.meadSubtype,
+                ingredients: {
+                    create: ingredients.map((ingredient, index) => ({
+                        ...ingredient,
+                        sortOrder: index,
+                    })),
+                },
+            },
+            include: {
+                ingredients: {
+                    include: {
+                        ingredient: true,
+                    },
+                    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+                },
+            },
+        });
+    });
+
+    return toRecipeDTO(recipe);
+}
+
+export async function archiveRecipe(recipeId: string) {
+    const userId = await getUserId();
+    if (!userId) {
+        throw new Error("Unauthorized");
+    }
+
+    const updated = await prisma.recipe.updateMany({
+        where: {
+            id: recipeId,
+            userId,
+            isArchived: false,
+        },
+        data: {
+            isArchived: true,
+        },
+    });
+
+    if (updated.count === 0) {
+        throw new Error("Recipe not found or not deletable");
+    }
 }
