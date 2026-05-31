@@ -4,6 +4,7 @@ import { signUpWithCredentials } from "../../../../server/auth-credentials";
 export async function POST(req: Request) {
   let body: {
     username?: unknown;
+    email?: unknown;
     password?: unknown;
     confirmPassword?: unknown;
     displayName?: unknown;
@@ -16,6 +17,8 @@ export async function POST(req: Request) {
 
   const username =
     typeof body.username === "string" ? body.username : "";
+  const email =
+    typeof body.email === "string" ? body.email : "";
   const password =
     typeof body.password === "string" ? body.password : "";
   const confirmPassword =
@@ -27,6 +30,7 @@ export async function POST(req: Request) {
 
   const result = await signUpWithCredentials({
     username,
+    email,
     password,
     confirmPassword,
     displayName,
