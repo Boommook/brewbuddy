@@ -133,8 +133,7 @@ export default function BatchCard({
         <Button
           type="button"
           variant="outline"
-          className=" bg-cayenne-red-600 hover:bg-cayenne-red-700 border-2 hover:border-cayenne-red-800 border-cayenne-red-700 text-golden-orange-200 hover:text-gray-230 rounded-lg text-lg px-4 py-3
-            shadow-style button-style"
+          className="add-button text-lg shadow-style button-style"
           onClick={(e) => {
             e.stopPropagation();
             router.push(`/batches/${id}/log`);
@@ -145,8 +144,7 @@ export default function BatchCard({
         <Button
           type="button"
           variant="outline"
-          className=" bg-cayenne-red-600 hover:bg-cayenne-red-700 border-2 hover:border-cayenne-red-800 border-cayenne-red-700 text-golden-orange-200 hover:text-gray-230 rounded-lg text-lg px-4 py-3
-            shadow-style button-style"
+          className="add-button text-lg shadow-style button-style"
           onClick={(e) => {
             e.stopPropagation();
             router.push(`/batches/${id}`);

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Globe, Pencil, Trash2 } from "lucide-react";
+import { Globe, Pencil, Trash2, User } from "lucide-react";
 import { Button } from "./ui/button";
 import type { RecipeDTO } from "@/src/types/recipe";
 import {
@@ -81,7 +81,7 @@ export default function RecipeCard({ recipe, currentUserId }: RecipeCardProps) {
         >
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="zilla-slab-bold truncate text-2xl text-gray-900">
+              <h2 className="zilla-slab-bold max-w-[70%] truncate text-2xl text-gray-900">
                 {recipe.name}
               </h2>
               {isGlobal ? (
@@ -90,14 +90,15 @@ export default function RecipeCard({ recipe, currentUserId }: RecipeCardProps) {
                   Global
                 </span>
               ) : (
-                <span className="rounded-full border border-harvest-orange-800 bg-harvest-orange-200/80 px-2 py-0.5 text-xs font-semibold text-harvest-orange-950">
+                <span className=" inline-flex items-center rounded-full border border-harvest-orange-800 bg-harvest-orange-200/80 px-2 py-0.5 text-xs font-semibold text-harvest-orange-950">
+                  <User className="size-3.5" aria-hidden />
                   Yours
                 </span>
               )}
             </div>
             <p className="mt-1 text-sm font-medium text-gray-800">
               {categoryLabel}
-              {subtypeLabel ? ` · ${subtypeLabel}` : ""}
+              {subtypeLabel ? ` · ${subtypeLabel}` : " · No subtype"}
             </p>
           </div>
 
@@ -122,7 +123,7 @@ export default function RecipeCard({ recipe, currentUserId }: RecipeCardProps) {
           ) : null}
         </div>
 
-        <div className="flex flex-1 flex-col gap-3 px-4 py-4 text-gray-800">
+        <div className="flex flex-1 flex-col gap-3 px-4 py-4 text-gray-800 bg-antique-white-100/50">
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <dt className="font-semibold text-gray-700">Target volume</dt>
@@ -150,18 +151,16 @@ export default function RecipeCard({ recipe, currentUserId }: RecipeCardProps) {
           {deleteError ? (
             <p className="text-sm text-red-900">{deleteError}</p>
           ) : null}
-        </div>
 
-        <div className="border-t-2 border-harvest-orange-700 bg-antique-white-100/50 px-4 py-3">
           <Button
             type="button"
             variant="outline"
-            className="w-full save-button"
+            className="w-full add-button text-md shadow-style hover:scale-102"
             onClick={() => router.push(`/createbatch?recipe=${recipe.id}`)}
           >
             Use in new batch
           </Button>
-        </div>
+        </div>          
       </article>
 
       <ConfirmDialog

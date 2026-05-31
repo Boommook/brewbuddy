@@ -1,4 +1,4 @@
-import { BrewCategory, MeadSubtype, PrismaClient, VolumeUnit } from "../src/generated/prisma/index.js";
+import { BatchStage, BrewCategory, MeadSubtype, PrismaClient, VolumeUnit } from "../src/generated/prisma/index.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
 
@@ -19,17 +19,88 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter })
 
 async function seedBasicRecipe(){
-    const recipe = await prisma.recipe.create({
-        data: {
-            userId: null,
-            name: 'Traditional Mead',
-            description: 'A traditional 1 gallon mead recipe',
-            targetVolume: 1,
-            targetVolumeUnit: VolumeUnit.GAL,
-            category: BrewCategory.MEAD,
-            meadSubtype: MeadSubtype.SHOW_MEAD,
+
+  const honey = await prisma.ingredient.findFirst({
+    where: {
+      name: 'Wildflower Honey',
+    },
+  })
+
+  const water = await prisma.ingredient.findFirst({
+    where: {
+      name: 'Tap Water',
+    },
+  })
+
+  const yeast = await prisma.ingredient.findFirst({
+    where: {
+      name: 'ICV K1-V1116',
+    },
+  })
+  
+  const nutrient = await prisma.ingredient.findFirst({
+    where: {
+      name: 'Fermaid O',
+    },
+  })
+
+  if (!honey || !water || !yeast || !nutrient) {
+    throw new Error('Ingredients not found')
+  }
+  
+  const RECIPE_NAME = "Traditional Mead";
+
+const ingredientLines = [
+  { ingredientId: honey.id, amount: 3, unit: "lb", stageAdded: BatchStage.PRIMARY },
+  { ingredientId: water.id, amount: 1, unit: "gal", stageAdded: BatchStage.PRIMARY },
+  { ingredientId: yeast.id, amount: 2.5, unit: "g", stageAdded: BatchStage.PRIMARY },
+  { ingredientId: nutrient.id, amount: 1.5, unit: "g", stageAdded: BatchStage.PRIMARY },
+];
+
+const existing = await prisma.recipe.findFirst({
+  where: { name: RECIPE_NAME, userId: null },
+});
+
+if (existing) {
+  await prisma.$transaction(async (tx) => {
+    await tx.recipeIngredient.deleteMany({ where: { recipeId: existing.id } });
+
+    await tx.recipe.update({
+      where: { id: existing.id },
+      data: {
+        description: "A traditional 1 gallon mead recipe",
+        targetVolume: 1,
+        targetVolumeUnit: VolumeUnit.GAL,
+        category: BrewCategory.MEAD,
+        meadSubtype: MeadSubtype.SHOW_MEAD,
+        ingredients: {
+          create: ingredientLines.map((line, index) => ({
+            ...line,
+            sortOrder: index,
+          })),
         },
-    })
+      },
+    });
+  });
+} else {
+  await prisma.recipe.create({
+    data: {
+      userId: null,
+      name: RECIPE_NAME,
+      description: "A traditional 1 gallon mead recipe",
+      targetVolume: 1,
+      targetVolumeUnit: VolumeUnit.GAL,
+      category: BrewCategory.MEAD,
+      meadSubtype: MeadSubtype.SHOW_MEAD,
+      ingredients: {
+        create: ingredientLines.map((line, index) => ({
+          ...line,
+          sortOrder: index,
+        })),
+      },
+    },
+  });
+}
 }
 
 async function main(){
