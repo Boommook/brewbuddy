@@ -1,12 +1,22 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend: Resend | undefined;
+
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY is not configured");
+  }
+
+  resend ??= new Resend(apiKey);
+  return resend;
+}
 
 export async function sendVerificationEmail(to: string, token: string) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const link = `${baseUrl}/api/auth/verify-email?token=${token}`;
 
-  await resend.emails.send({
+  await getResendClient().emails.send({
     from: process.env.EMAIL_FROM ?? "noreply@brewbuddy.app",
     to,
     subject: "Verify your BrewBuddy email",
